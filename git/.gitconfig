@@ -11,4 +11,4 @@
 [push]
 	default = simple
 [core]
-	excludesfile = ~/.gitignore
+	excludesfile = ~/.gitignore_global
