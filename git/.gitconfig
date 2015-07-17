@@ -1,0 +1,12 @@
+[user]
+	name = Hendrik van Antwerpen
+	email = hendrik@van-antwerpen.net
+[color]
+	diff = auto
+	status = auto
+	branch = auto
+	ui = true
+[merge]
+	defaultToUpstream = true
+[push]
+	default = simple

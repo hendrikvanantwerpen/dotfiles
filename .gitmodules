@@ -1,0 +1,9 @@
+[submodule "xmonad/.xmonad"]
+	path = xmonad/.xmonad
+	url = git@github.com:hendrikvanantwerpen/.xmonad.git
+[submodule "emacs/.emacs.d"]
+	path = emacs/.emacs.d
+	url = git@github.com:hendrikvanantwerpen/.emacs.d.git
+[submodule "bash/.bash/git-aware-prompt"]
+	path = bash/.bash/git-aware-prompt
+	url = https://github.com/jimeh/git-aware-prompt.git
