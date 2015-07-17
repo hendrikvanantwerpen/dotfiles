@@ -1,0 +1,12 @@
+# .bash_profile.vogelstruys
+
+# Force SUN JDK for IntelliJ
+export IDEA_JDK=/usr/lib/jvm/java-8-oracle
+
+# make Java work with xmonad
+export _JAVA_AWT_WM_NONREPARENTING=1
+
+# Enable more colors in terminal
+if [ "$TERM" = "xterm" ]; then
+    export TERM=xterm-256color
+fi

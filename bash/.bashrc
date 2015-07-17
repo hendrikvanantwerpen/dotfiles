@@ -1,53 +1,28 @@
-# .bashrc
+# .bashrc - Non-interactive definitions
+
+. ~/.bash_functions
 
 # Source global definitions
-if [ -f /etc/bashrc ]; then
-	. /etc/bashrc
+source_if_exists /etc/bashrc
+
+source_if_exists ~/.secrets
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+    export PATH="$HOME/bin:$PATH"
 fi
 
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
-   . /etc/bash_completion
-fi
+export VISUAL=vim
 
-# Source our shell agnostic variables
-if [ -f "$HOME/.shrc" ]; then
-    . "$HOME/.shrc"
-fi
+if [ -z "$XDG_CACHE_HOME" ]; then
+    export XDG_CACHE_HOME="`mktemp -d -t cache.XXXX`"
+fi   
 
-case "$-" in
-    *i*) # set interactive things
-        # Git aware prompt
-        export GITAWAREPROMPT=~/.bash/git-aware-prompt
-        . $GITAWAREPROMPT/main.sh
-        export PS1="\u@\h:\w\[$txtcyn\]\$git_branch\[$txtylw\]\$git_dirty\[$txtrst\]\$ "
-        export SUDO_PS1="\[$bakred\]\u@\h\[$txtrst\]:\w\$ "
-        ;;
-    *) # ignore non-interactive
-        ;;
-esac
-
-# Dir handling
-function cd {
-    if (("$#" > 0)); then
-        pushd "$@" > /dev/null
-    else
-        cd $HOME
-    fi
-}
-alias dirs='dirs -v'
-
-alias rm='rm -i'
-alias cp='cp -i'
-alias mv='mv -i'
-
-alias l.='ls -d .* --color=tty'
-alias ll='ls -l --color=tty'
-alias ls='ls --color=tty'
-
-alias timestamp='date +%Y%m%dT%H%M%S'
+# Give Maven more memory
+export MAVEN_OPTS="-Xss16m -Xms512m -Xmx2048m -XX:MaxPermSize=512m"
 
 # OPAM configuration
-. /home/hendrik/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
+source_if_exists ~/.opam/opam-init/init.sh >& /dev/null || true
+
+# Source local definitions
+source_if_exists "~/.bashrc.`hostname`"

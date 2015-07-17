@@ -18,6 +18,3 @@ let javascript_enable_domhtmlcss=1
 set wildmode=longest,list
 
 set history=1000
-
-call pathogen#infect()
-call pathogen#helptags()
