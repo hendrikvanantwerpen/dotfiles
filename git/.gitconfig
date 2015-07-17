@@ -10,3 +10,5 @@
 	defaultToUpstream = true
 [push]
 	default = simple
+[core]
+	excludesfile = ~/.gitignore
