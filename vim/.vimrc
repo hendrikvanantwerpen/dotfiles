@@ -12,9 +12,13 @@ nmap <S-Down> <C-W><Down>
 
 set modeline
 
-syntax on
-let javascript_enable_domhtmlcss=1 
-
 set wildmode=longest,list
 
 set history=1000
+
+call pathogen#infect()
+call pathogen#helptags()
+
+syntax on
+filetype plugin indent on
+let javascript_enable_domhtmlcss=1 

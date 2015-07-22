@@ -1,0 +1,11 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =9
+let g:netrw_dirhist_1='/home/hendrik/slde/spoofax-releng.git/spoofax/org.metaborg.spoofax.generator/src/main/resources/org/metaborg/spoofax/generator/editor/java'
+let g:netrw_dirhist_2='/home/hendrik/slde/spoofax-releng.git/spoofax/org.metaborg.spoofax.generator/src/main/resources/org/metaborg/spoofax/generator/editor/java/{{packagePath}}'
+let g:netrw_dirhist_3='/home/hendrik/slde/spoofax-releng.git/spoofax/org.metaborg.spoofax.generator/src/main/resources/org/metaborg/spoofax/generator/editor/java/{{packagePath}}/strategies'
+let g:netrw_dirhist_4='/home/hendrik/slde/spoofax-releng.git/spoofax-deploy/org.metaborg.maven.parent.plugin'
+let g:netrw_dirhist_5='/home/hendrik/slde/spoofax-dev-eclipse/dropins/lala/ds/eclipse'
+let g:netrw_dirhist_6='/home/hendrik/slde/spoofax-releng.git/runtime-libraries/org.metaborg.meta.runtime.libanalysis2/trans/libanalysis2/abstract-syntax'
+let g:netrw_dirhist_7='/home/hendrik/slde/spoofax-dev-eclipse-workspace/nabl/org.metaborg.meta.lang.nabl2/utils'
+let g:netrw_dirhist_8='/etc/polkit-1/localauthority'
+let g:netrw_dirhist_9='/home/hendrik/.emacs.d'

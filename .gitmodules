@@ -7,3 +7,9 @@
 [submodule "bash/.bash/git-aware-prompt"]
 	path = bash/.bash/git-aware-prompt
 	url = https://github.com/jimeh/git-aware-prompt.git
+[submodule "vim/.vim/bundle/vim-javascript"]
+	path = vim/.vim/bundle/vim-javascript
+	url = https://github.com/pangloss/vim-javascript.git
+[submodule "vim/.vim/bundle/vim-scala"]
+	path = vim/.vim/bundle/vim-scala
+	url = https://github.com/derekwyatt/vim-scala.git
