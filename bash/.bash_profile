@@ -36,5 +36,8 @@ alias cp='cp -i'
 alias mv='mv -i'
 alias timestamp='date +%Y%m%dT%H%M%S'
 
+# Prevent Java tools from stealing focus
+export JAVA_TOOL_OPTIONS="-Djava.awt.headless=true"
+
 # Source local definitions
 source_if_exists "$HOME/.bash_profile.`hostname`"

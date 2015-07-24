@@ -9,6 +9,7 @@ nmap <S-Left> <C-W><Left>
 nmap <S-Right> <C-W><Right>
 nmap <S-Up> <C-W><Up>
 nmap <S-Down> <C-W><Down>
+nnoremap <ESC>q gqip
 
 set modeline
 
