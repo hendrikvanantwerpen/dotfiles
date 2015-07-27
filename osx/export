@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -eu
+
+function export {
+    D="`echo $1 | sed -e 's/\.plist$//'`"
+    echo "Exporting $D"
+    defaults export "$D" "$D.plist"
+}
+
+if [ $# -gt 0 ]; then
+    for d in "$@"; do
+        export "$d"
+    done
+else
+    for d in *.plist; do
+        export "$d"
+    done
+fi

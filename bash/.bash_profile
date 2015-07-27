@@ -34,6 +34,11 @@ alias dirs='dirs -v'
 alias rm='rm -i'
 alias cp='cp -i'
 alias mv='mv -i'
+
+alias l.='ls -d .* --color=tty'
+alias ll='ls -l --color=tty'
+alias ls='ls --color=tty'
+
 alias timestamp='date +%Y%m%dT%H%M%S'
 
 # Prevent Java tools from stealing focus

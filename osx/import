@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -eu
+
+function import {
+    D="`echo $1 | sed -e 's/\.plist$//'`"
+    echo "Importing $D"
+    defaults import "$D" "$D.plist"
+}
+
+if [ $# -gt 0 ]; then
+    for d in "$@"; do
+        import "$d"
+    done
+else
+    for d in *.plist; do
+        import "$d"
+    done
+fi
