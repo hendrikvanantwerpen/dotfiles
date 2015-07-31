@@ -1,15 +1,15 @@
-[submodule "xmonad/.xmonad"]
-	path = xmonad/.xmonad
+[submodule "X11/.xmonad"]
+	path = X11/.xmonad
 	url = git@github.com:hendrikvanantwerpen/.xmonad.git
-[submodule "emacs/.emacs.d"]
-	path = emacs/.emacs.d
+[submodule "gnu/.emacs.d"]
+	path = gnu/.emacs.d
 	url = git@github.com:hendrikvanantwerpen/.emacs.d.git
-[submodule "bash/.bash/git-aware-prompt"]
-	path = bash/.bash/git-aware-prompt
+[submodule "gnu/.bash/git-aware-prompt"]
+	path = gnu/.bash/git-aware-prompt
 	url = https://github.com/jimeh/git-aware-prompt.git
-[submodule "vim/.vim/bundle/vim-javascript"]
-	path = vim/.vim/bundle/vim-javascript
+[submodule "gnu/.vim/bundle/vim-javascript"]
+	path = gnu/.vim/bundle/vim-javascript
 	url = https://github.com/pangloss/vim-javascript.git
-[submodule "vim/.vim/bundle/vim-scala"]
-	path = vim/.vim/bundle/vim-scala
+[submodule "gnu/.vim/bundle/vim-scala"]
+	path = gnu/.vim/bundle/vim-scala
 	url = https://github.com/derekwyatt/vim-scala.git

@@ -1,0 +1,5 @@
+# .bashrc.sphaeramundi - Local definitions
+
+export PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
+export MANPATH="$(brew --prefix coreutils)/libexec/gnuman:$MANPATH"
+export SCALA_HOME="$(brew --prefix scala)/libexec"
