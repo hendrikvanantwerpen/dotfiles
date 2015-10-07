@@ -10,6 +10,9 @@ MAX_FULLS_WITH_INCRS=1
 MAX_FULLBKP_AGE=1M
 DUPL_PARAMS="$DUPL_PARAMS --full-if-older-than $MAX_FULLBKP_AGE " 
 
-for FILENAME in .duplicity-ignore .git .bzr .svn; do
+VOLSIZE=256
+DUPL_PARAMS="$DUPL_PARAMS --volsize $VOLSIZE "
+
+for FILENAME in .backup-ignore .git .bzr .svn; do
     DUPL_PARAMS="$DUPL_PARAMS --exclude-if-present '$FILENAME' "
 done
