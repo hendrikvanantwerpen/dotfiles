@@ -9,12 +9,12 @@
                 <not>TERMINAL</not>
                 <autogen>
                     --KeyToKey--
-                    KeyCode::CURSOR_LEFT, VK_COMMAND,
+                    KeyCode::CURSOR_LEFT, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_COMMAND,
                     KeyCode::CURSOR_LEFT, VK_OPTION
                 </autogen>
                 <autogen>
                     --KeyToKey--
-                    KeyCode::CURSOR_RIGHT, VK_COMMAND,
+                    KeyCode::CURSOR_RIGHT, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_COMMAND,
                     KeyCode::CURSOR_RIGHT, VK_OPTION
                 </autogen>
             </block>
@@ -23,14 +23,29 @@
                 <autogen>
                     __KeyToKey__
                     KeyCode::CURSOR_LEFT, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_COMMAND,
-                    KeyCode::ESCAPE, KeyCode::B,
+                    KeyCode::ESCAPE, KeyCode::B
                 </autogen>
                 <autogen>
                     __KeyToKey__
                     KeyCode::CURSOR_RIGHT, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_COMMAND,
-                    KeyCode::ESCAPE, KeyCode::F,
+                    KeyCode::ESCAPE, KeyCode::F
                 </autogen>
             </block>
+        </item>
+        <item>
+            <name>Use Command+PageUp/Command+PageDown to switch tabs in Firefox</name>
+            <identifier>private.firefox_commandlr_switch_tab</identifier>
+            <only>FIREFOX</only>
+            <autogen>
+                __KeyToKey__
+                FROMKEYCODE_PAGEUP, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_COMMAND,
+                FROMKEYCODE_PAGEUP, VK_CONTROL
+            </autogen>
+            <autogen>
+                __KeyToKey__
+                FROMKEYCODE_PAGEDOWN, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_COMMAND,
+                FROMKEYCODE_PAGEDOWN, VK_CONTROL
+            </autogen>
         </item>
     </item>
 </root>
