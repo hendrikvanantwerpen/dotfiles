@@ -1,0 +1,6 @@
+#!/bin/bash
+
+git fetch && \
+    git merge && \
+    git submodule update --init --recursive && \
+    git submodule foreach git checkout master
