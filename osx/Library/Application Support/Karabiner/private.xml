@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<root>
+    <item>
+        <name>Personal Settings</name>
+        <item>
+            <name>Use Command+Left/Command+Right to move one word left/right</name>
+            <identifier>private.commandlr_to_wordlr</identifier>
+            <block>
+                <not>TERMINAL</not>
+                <autogen>
+                    --KeyToKey--
+                    KeyCode::CURSOR_LEFT, VK_COMMAND,
+                    KeyCode::CURSOR_LEFT, VK_OPTION
+                </autogen>
+                <autogen>
+                    --KeyToKey--
+                    KeyCode::CURSOR_RIGHT, VK_COMMAND,
+                    KeyCode::CURSOR_RIGHT, VK_OPTION
+                </autogen>
+            </block>
+            <block>
+                <only>TERMINAL</only>
+                <autogen>
+                    __KeyToKey__
+                    KeyCode::CURSOR_LEFT, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_COMMAND,
+                    KeyCode::ESCAPE, KeyCode::B,
+                </autogen>
+                <autogen>
+                    __KeyToKey__
+                    KeyCode::CURSOR_RIGHT, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_COMMAND,
+                    KeyCode::ESCAPE, KeyCode::F,
+                </autogen>
+            </block>
+        </item>
+    </item>
+</root>
