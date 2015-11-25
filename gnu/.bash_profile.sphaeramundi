@@ -3,3 +3,4 @@
 source_if_exists "$(brew --prefix)/etc/bash_completion"
 eval "$(jenv init -)"
 eval "$(scalaenv init -)"
+eval "$(rbenv init -)"

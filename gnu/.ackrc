@@ -1,5 +1,8 @@
 --ignore-file=is:.DS_Store
 --ignore-dir=.cache
 --ignore-dir=target
+--ignore-file=match:/\.tbl$/
+--ignore-file=match:/\.pp.af$/
 --ignore-file=match:/\.ctree$/
+--ignore-file=match:/\.rtree$/
 --ignore-file=match:/\.packed\.esv$/
