@@ -8,12 +8,12 @@
             <block>
                 <not>TERMINAL</not>
                 <autogen>
-                    --KeyToKey--
+                    __KeyToKey__
                     KeyCode::CURSOR_LEFT, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_COMMAND,
                     KeyCode::CURSOR_LEFT, VK_OPTION
                 </autogen>
                 <autogen>
-                    --KeyToKey--
+                    __KeyToKey__
                     KeyCode::CURSOR_RIGHT, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_COMMAND,
                     KeyCode::CURSOR_RIGHT, VK_OPTION
                 </autogen>

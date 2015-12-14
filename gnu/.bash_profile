@@ -30,6 +30,11 @@ function cd {
 }
 alias dirs='dirs -v'
 
+# editor
+export EDITOR="emacsclient -t"
+export VISUAL="$EDITOR"
+alias edit="$EDITOR"
+
 # Common aliases
 alias rm='rm -i'
 alias cp='cp -i'
