@@ -1,4 +1,4 @@
-# .bash_profile.vogelstruys
+# .profile.vogelstruys
 
 # Force SUN JDK for IntelliJ
 export IDEA_JDK=/usr/lib/jvm/java-8-oracle

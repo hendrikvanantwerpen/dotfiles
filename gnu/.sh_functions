@@ -1,0 +1,8 @@
+# .sh_functions - Useful Shell functions
+
+source_if_exists()
+{
+    if [ -f "$1" ]; then
+        . "$1"
+    fi
+}

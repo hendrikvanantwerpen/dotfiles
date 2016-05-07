@@ -1,6 +1,6 @@
-# .bash_profile - Interactive definitions
+# .profile - Interactive definitions
 
-. "$HOME/.bash_functions"
+. "$HOME/.sh_functions"
 
 # Source non-interactive definitions
 source_if_exists "$HOME/.bashrc"
@@ -45,4 +45,4 @@ alias timestamp='date +%Y%m%dT%H%M%S'
 export JAVA_TOOL_OPTIONS="-Djava.awt.headless=true"
 
 # Source local definitions
-source_if_exists "$HOME/.bash_profile.`hostname`"
+source_if_exists "$HOME/.profile.`hostname`"
