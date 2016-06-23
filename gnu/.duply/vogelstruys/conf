@@ -1,6 +1,6 @@
 GPG_KEY='773E854A'
 
-TARGET='file:///raid/backups/'
+TARGET='file:///home/backups/'
 
 SOURCE='/'
 
@@ -13,6 +13,6 @@ DUPL_PARAMS="$DUPL_PARAMS --full-if-older-than $MAX_FULLBKP_AGE "
 VOLSIZE=256
 DUPL_PARAMS="$DUPL_PARAMS --volsize $VOLSIZE "
 
-for FILENAME in .backup-ignore; do
+for FILENAME in .backup-ignore .git .bzr .svn; do
     DUPL_PARAMS="$DUPL_PARAMS --exclude-if-present '$FILENAME' "
 done

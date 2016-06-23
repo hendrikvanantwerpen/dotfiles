@@ -1,6 +1,6 @@
 # .bashrc - Non-interactive definitions
 
-. "$HOME/.bash_functions"
+. "$HOME/.sh_functions"
 
 # Source global definitions
 source_if_exists /etc/bashrc

@@ -1,4 +1,4 @@
-# .bash_profile.sphaeramundi - Local definitions
+# .profile.sphaeramundi - Local definitions
 
 source_if_exists "$(brew --prefix)/etc/bash_completion"
 eval "$(jenv init -)"
