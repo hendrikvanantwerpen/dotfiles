@@ -22,7 +22,7 @@ export SUDO_PS1="\[$bakred\]\u@\h\[$txtrst\]:\w\$ "
 
 # Dir handling
 function cd {
-    if (("$#" > 0)); then
+    if (($# > 0)); then
         pushd "$@" > /dev/null
     else
         cd $HOME
@@ -34,6 +34,24 @@ alias dirs='dirs -v'
 export EDITOR="emacsclient -t"
 export VISUAL="$EDITOR"
 alias edit="$EDITOR"
+
+function emacsd {
+    if (($# > 0)); then
+        case "$1" in
+            "--start"|"--daemon")
+                emacs --daemon
+                ;;
+            "--kill")
+                emacsclient -e '(kill-emacs)'
+                ;;
+            *)
+                echo "Unknown Emacs command: $1"
+                ;;
+        esac
+    else
+        emacs --daemon
+    fi
+}
 
 # Common aliases
 alias rm='rm -i'

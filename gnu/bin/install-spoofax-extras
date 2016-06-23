@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+
+set -eu
+
+function usage {
+    echo <<EOF
+Usage: $0 [command] [eclipse-dir]
+  Commands:
+  -a, --all (clean,install,set-memory)
+  -c, --clean
+  -i, --install
+  -sm, --set-memory
+  -li, --list-installed
+  -la, --list-available
+EOF
+}
+
+function die {
+    echo $*
+    usage
+    exit 1
+}
+
+BASEDIR=.
+COMMAND=all
+
+if [ $# -gt 0 ]; then
+    case "$1" in
+        "-a"|"--all")
+            COMMAND=all
+            ;;
+        "-c"|"--clean")
+            COMMAND=clean
+            ;;
+        "-i"|"--install")
+            COMMAND=install
+            ;;
+        "-sm"|"--set-memory")
+            COMMAND=set_memory
+            ;;
+        "-li"|"--list-installed")
+            COMMAND=list_installed
+            ;;
+        "-la"|"--list-available")
+            COMMAND=list_available
+            ;;
+        "-"*)
+            die "ERROR: Unknown option: $1"
+            ;;
+    esac
+    shift
+fi
+
+if [ $# -gt 0 ]; then
+    BASEDIR="$1"
+    shift
+fi
+
+if [ $# -gt 0 ]; then
+    die "ERROR: Extra arguments found: $*"
+fi
+
+if [ ! -d "$BASEDIR" ]; then
+    die "ERROR: Cannot find base directory $BASEDIR"
+fi
+
+OS=$(uname -s)
+case "$OS" in
+    Darwin)
+        ECLIPSE="$BASEDIR/Contents/MacOS/eclipse"
+        ECLIPSE_CONF="$BASEDIR/Contents/Eclipse/eclipse.ini"
+        ;;
+
+    Linux)
+        ECLIPSE="$BASEDIR/eclipse"
+        ECLIPSE_CONF="$BASEDIR/eclipse.ini"
+        ;;
+
+    *)
+        die "ERROR: This script does not support $OS."
+        ;;
+esac
+
+if [ ! -e "$ECLIPSE" ]; then
+    die "ERROR: Cannot find Eclipse executable at $ECLIPSE"
+fi
+if [ ! -f "$ECLIPSE_CONF" ]; then
+    die "ERROR: Cannot find Eclipse configuration at $ECLIPSE_CONF"
+fi
+
+declare -A REPOS FEATURES
+
+REPOS[ECLIPSE]=http://download.eclipse.org/releases/mars/
+
+REPOS[SPOOFAX]=http://download.spoofax.org/update/nightly/
+
+REPOS[VRAPPER]=http://vrapper.sourceforge.net/update-site/stable/
+FEATURES[VRAPPER]=net.sourceforge.vrapper.feature.group,net.sourceforge.vrapper.plugin.splitEditor.feature.group,net.sourceforge.vrapper.eclipse.jdt.feature.feature.group
+
+REPOS[BUILDSHIP]=http://download.eclipse.org/buildship/updates/e45/milestones/1.1/
+FEATURES[BUILDSHIP]=org.eclipse.buildship.feature.group
+
+REPOS[GRECLIPSE]=http://dist.springsource.org/snapshot/GRECLIPSE/e4.5/
+FEATURES[GRECLIPSE]=org.codehaus.groovy.eclipse.feature.feature.group,org.codehaus.groovy.headless.feature.feature.group,org.codehaus.groovy.jdt.patch.feature.group,org.codehaus.groovy.m2eclipse.feature.feature.group
+
+REPOS[M2E]=http://download.eclipse.org/technology/m2e/releases/1.6/,http://ifedorenko.github.com/m2e-extras/,http://download.jboss.org/jbosstools/updates/m2e-extensions/m2e-apt
+FEATURES[M2E]=com.ifedorenko.m2e.mavendev.feature.feature.group,org.jboss.tools.maven.apt.feature.feature.group
+
+#REPOS[SCALA]=http://download.scala-ide.org/sdk/lithium/e44/scala211/stable/site,http://alchim31.free.fr/m2e-scala/update-site
+#FEATURES[SCALA]=org.scala-ide.sdt.feature.feature.group,org.scala.tools.eclipse.search.feature.feature.group,org.scalaide.worksheet.feature.feature.group,org.scala-ide.sdt.weaving.feature.feature.group,org.maven.ide.eclipse.scala_feature.feature.group
+
+REPOS[YEDIT]=http://dadacoalition.org/yedit/
+FEATURES[YEDIT]=org.dadacoalition.yedit.feature.feature.group
+
+# join repositories and artifacts
+IFS_OLD="$IFS"
+IFS=","
+ALLREPOS="${REPOS[*]}"
+ALLFEATURES="${FEATURES[*]}"
+IFS="$IFS_OLD"
+
+P2DIRECTOR="$ECLIPSE -noSplash -application org.eclipse.equinox.p2.director -repository $ALLREPOS"
+
+function all {
+    clean
+    install
+    set_memory
+}
+
+function clean {
+    $P2DIRECTOR -clean -purgeHistory
+}
+
+function install {
+    $P2DIRECTOR -installIUs $ALLFEATURES
+}
+
+function set_memory {
+    sed -i -e 's/-Xmx[[:alnum:]]\+/-Xmx4G/' "$ECLIPSE_CONF"
+}
+
+function list_installed {
+    $P2DIRECTOR -listInstalledRoots
+}
+
+function list_available {
+    $P2DIRECTOR -list
+}
+
+$COMMAND
