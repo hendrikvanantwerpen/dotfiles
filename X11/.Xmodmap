@@ -1,5 +1,15 @@
 !! .Xmodmap
-remove lock = Caps_Lock
-keysym Control_L = Multi_key
-keysym Caps_Lock = Control_L
-add control = Control_L
+clear lock
+clear control
+
+!Left control key
+keycode 37  = Multi_key
+
+!Tab key
+keycode 66  = Control_L
+
+!Windows key
+keycode 133 = Super_L
+
+add control = Control_L Control_R
+add mod4 = Super_L
