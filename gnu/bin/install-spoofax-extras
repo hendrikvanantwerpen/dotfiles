@@ -3,15 +3,18 @@
 set -eu
 
 function usage {
-    echo <<EOF
-Usage: $0 [command] [eclipse-dir]
+    cat <<EOF
+Usage: $0 [eclipse-dir] [command] [options]
   Commands:
-  -a, --all (clean,install,set-memory)
-  -c, --clean
-  -i, --install
-  -sm, --set-memory
-  -li, --list-installed
-  -la, --list-available
+  all (clean,install,set-memory)
+  clean
+  install
+  uninstall
+  set-memory
+  list-installed
+  list-available
+  run
+  help
 EOF
 }
 
@@ -21,47 +24,59 @@ function die {
     exit 1
 }
 
-BASEDIR=.
-COMMAND=all
-
-if [ $# -gt 0 ]; then
-    case "$1" in
-        "-a"|"--all")
-            COMMAND=all
-            ;;
-        "-c"|"--clean")
-            COMMAND=clean
-            ;;
-        "-i"|"--install")
-            COMMAND=install
-            ;;
-        "-sm"|"--set-memory")
-            COMMAND=set_memory
-            ;;
-        "-li"|"--list-installed")
-            COMMAND=list_installed
-            ;;
-        "-la"|"--list-available")
-            COMMAND=list_available
-            ;;
-        "-"*)
-            die "ERROR: Unknown option: $1"
-            ;;
-    esac
-    shift
+if [ $# -eq 0 ]; then
+    die "ERROR: Base directory not specified."
 fi
-
-if [ $# -gt 0 ]; then
-    BASEDIR="$1"
-    shift
-fi
-
-if [ $# -gt 0 ]; then
-    die "ERROR: Extra arguments found: $*"
-fi
-
+BASEDIR="$1"
+shift
 if [ ! -d "$BASEDIR" ]; then
     die "ERROR: Cannot find base directory $BASEDIR"
+fi
+
+
+COMMAND=all
+if [ $# -gt 0 ]; then
+    case "$1" in
+        "help")
+            usage
+            exit 0
+            ;;
+        "all")
+            COMMAND=all
+            shift
+            ;;
+        "clean")
+            COMMAND=clean
+            shift
+            ;;
+        "install")
+            COMMAND=install
+            shift
+            ;;
+        "uninstall")
+            COMMAND=uninstall
+            shift
+            ;;
+        "set-memory")
+            COMMAND=set_memory
+            shift
+            ;;
+        "list-installed")
+            COMMAND=list_installed
+            shift
+            ;;
+        "list-available")
+            COMMAND=list_available
+            shift
+            ;;
+        "run")
+            COMMAND=run
+            shift
+            ;;
+        *)
+            echo "Defaulting to 'all'"
+            ;;
+    esac
 fi
 
 OS=$(uname -s)
@@ -90,18 +105,16 @@ fi
 
 declare -A REPOS FEATURES
 
-REPOS[ECLIPSE]=http://download.eclipse.org/releases/mars/
-
-REPOS[SPOOFAX]=http://download.spoofax.org/update/nightly/
+REPOS[ECLIPSE]=http://download.eclipse.org/releases/neon/
 
 REPOS[VRAPPER]=http://vrapper.sourceforge.net/update-site/stable/
 FEATURES[VRAPPER]=net.sourceforge.vrapper.feature.group,net.sourceforge.vrapper.plugin.splitEditor.feature.group,net.sourceforge.vrapper.eclipse.jdt.feature.feature.group
 
-REPOS[BUILDSHIP]=http://download.eclipse.org/buildship/updates/e45/milestones/1.1/
-FEATURES[BUILDSHIP]=org.eclipse.buildship.feature.group
+#REPOS[BUILDSHIP]=http://download.eclipse.org/buildship/updates/e45/milestones/1.1/
+#FEATURES[BUILDSHIP]=org.eclipse.buildship.feature.group
 
-REPOS[GRECLIPSE]=http://dist.springsource.org/snapshot/GRECLIPSE/e4.5/
-FEATURES[GRECLIPSE]=org.codehaus.groovy.eclipse.feature.feature.group,org.codehaus.groovy.headless.feature.feature.group,org.codehaus.groovy.jdt.patch.feature.group,org.codehaus.groovy.m2eclipse.feature.feature.group
+#REPOS[GRECLIPSE]=http://dist.springsource.org/snapshot/GRECLIPSE/e4.5/
+#FEATURES[GRECLIPSE]=org.codehaus.groovy.eclipse.feature.feature.group,org.codehaus.groovy.headless.feature.feature.group,org.codehaus.groovy.jdt.patch.feature.group,org.codehaus.groovy.m2eclipse.feature.feature.group
 
 REPOS[M2E]=http://download.eclipse.org/technology/m2e/releases/1.6/,http://ifedorenko.github.com/m2e-extras/,http://download.jboss.org/jbosstools/updates/m2e-extensions/m2e-apt
 FEATURES[M2E]=com.ifedorenko.m2e.mavendev.feature.feature.group,org.jboss.tools.maven.apt.feature.feature.group
@@ -112,14 +125,17 @@ FEATURES[M2E]=com.ifedorenko.m2e.mavendev.feature.feature.group,org.jboss.tools.
 REPOS[YEDIT]=http://dadacoalition.org/yedit/
 FEATURES[YEDIT]=org.dadacoalition.yedit.feature.feature.group
 
+REPOS[FINDBUGS]=http://findbugs.cs.umd.edu/eclipse/
+FEATURES[FINDBUGS]=edu.umd.cs.findbugs.plugin.eclipse
+
 # join repositories and artifacts
 IFS_OLD="$IFS"
 IFS=","
-ALLREPOS="${REPOS[*]}"
+ALLREPOS="-repository ${REPOS[*]}"
 ALLFEATURES="${FEATURES[*]}"
 IFS="$IFS_OLD"
 
-P2DIRECTOR="$ECLIPSE -noSplash -application org.eclipse.equinox.p2.director -repository $ALLREPOS"
+P2DIRECTOR="$ECLIPSE -noSplash -application org.eclipse.equinox.p2.director"
 
 function all {
     clean
@@ -132,7 +148,17 @@ function clean {
 }
 
 function install {
-    $P2DIRECTOR -installIUs $ALLFEATURES
+    if [ $# -gt 0 ]; then
+        TO_INSTALL=$1
+        shift
+        while [ $# -gt 0 ]; do
+            TO_INSTALL="$TO_INSTALL,$1"
+            shift
+        done
+    else
+        TO_INSTALL=$ALLFEATURES
+    fi
+    $P2DIRECTOR $ALLREPOS -installIUs $TO_INSTALL
 }
 
 function set_memory {
@@ -144,7 +170,25 @@ function list_installed {
 }
 
 function list_available {
-    $P2DIRECTOR -list
+    $P2DIRECTOR $ALLREPOS -list
 }
 
-$COMMAND
+function uninstall {
+    if [ $# -gt 0 ]; then
+        TO_REMOVE=$1
+        shift
+        while [ $# -gt 0 ]; do
+            TO_REMOVE="$TO_REMOVE,$1"
+            shift
+        done
+    else
+        TO_REMOVE=$ALLFEATURES
+    fi
+    $P2DIRECTOR -uninstallIUs $TO_REMOVE
+}
+
+function run {
+    $P2DIRECTOR $*
+}
+
+$COMMAND $*

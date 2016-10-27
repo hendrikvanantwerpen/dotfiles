@@ -5,3 +5,5 @@ for pkg in coreutils; do
     export MANPATH="$(brew --prefix $pkg)/libexec/gnuman:$MANPATH"
 done
 export SCALA_HOME="$(brew --prefix scala)/libexec"
+
+alias bsdbash="env -i /bin/bash --noprofile --norc"

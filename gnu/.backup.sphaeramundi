@@ -1,0 +1,19 @@
+BACKUP_REPO=/Backup/
+BACKUP_DIRS=( \
+    "$HOME"
+)
+BACKUP_OPTS=( \
+    --exclude-if-present .git \
+    --exclude-if-present .svn \
+    --exclude-if-present .bzr \
+    --exclude-if-present .hg \
+    --exclude '*/Library/Application Support/SpiderOakONE' \
+    --exclude '*/.bundler/cache' \
+    --exclude '*/.gradle/caches' \
+    --exclude '*/.cocoapods' \
+    --exclude '*/.cache' \
+    --exclude '*/.gem' \
+    --exclude '*/.Trash' \
+    --exclude '*/Library/Caches' \
+    --exclude '*/.m2/repository' \
+)
