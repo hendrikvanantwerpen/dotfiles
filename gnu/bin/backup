@@ -44,8 +44,8 @@ BACKUP_TARGET="$BACKUP_REPO::$BACKUP_NAME" \
 borg create \
     --compression lz4 \
     --chunker-params 19,23,21,4095 \
+    --one-file-system \
     "${BACKUP_OPTS[@]}" \
     "$BACKUP_TARGET" \
-    "${BACKUP_DIRS[@]}" \
-    /Users/hendrik
+    "${BACKUP_DIRS[@]}"
 

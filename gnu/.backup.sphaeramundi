@@ -1,6 +1,6 @@
 BACKUP_REPO=/Backup/
 BACKUP_DIRS=( \
-    "$HOME"
+    /Users/hendrik
 )
 BACKUP_OPTS=( \
     --exclude-if-present .git \

@@ -1,0 +1,9 @@
+BACKUP_REPO=/data/backup/
+BACKUP_DIRS=( \
+    /etc
+    /var
+    /home/hendrik
+)
+BACKUP_OPTS=( \
+    --exclude /var/cache
+)
