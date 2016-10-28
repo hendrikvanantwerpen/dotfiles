@@ -4,3 +4,8 @@ source_if_exists "$(brew --prefix)/etc/bash_completion"
 eval "$(jenv init -)"
 eval "$(scalaenv init -)"
 eval "$(rbenv init -)"
+
+export LC_ALL="en_US.UTF-8"
+
+alias showFiles='defaults write com.apple.finder AppleShowAllFiles YES'
+alias hideFiles='defaults write com.apple.finder AppleShowAllFiles NO'

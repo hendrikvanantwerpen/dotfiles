@@ -1,0 +1,12 @@
+BACKUP_REPO=/Backup/
+BACKUP_DIRS=( \
+    /Users/hendrik
+)
+BACKUP_OPTS=( \
+    --exclude-if-present .git
+    --exclude-if-present .svn
+    --exclude-if-present .bzr
+    --exclude-if-present .hg
+    --exclude 'sh:**/.Trash'
+    --exclude 'sh:**/*.app'
+)

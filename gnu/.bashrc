@@ -25,4 +25,4 @@ export MAVEN_OPTS="-Xss16m -Xms512m -Xmx2048m -XX:MaxPermSize=512m"
 source_if_exists "$HOME/.opam/opam-init/init.sh" >& /dev/null || true
 
 # Source local definitions
-source_if_exists "$HOME/.bashrc.`hostname`"
+source_if_exists "$HOME/.bashrc.`hostname -s`"

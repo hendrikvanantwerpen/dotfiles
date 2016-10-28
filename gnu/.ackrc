@@ -1,3 +1,6 @@
+--type-add=esv=.esv
+--type-add=stratego=.str
+--type-add=nabl2=.nabl2
 --ignore-file=is:.DS_Store
 --ignore-dir=.cache
 --ignore-dir=target

@@ -6,6 +6,8 @@
 	status = auto
 	branch = auto
 	ui = true
+[diff]
+    compactionHeuristic = true
 [merge]
 	defaultToUpstream = true
 [push]
