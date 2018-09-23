@@ -1,6 +1,9 @@
 *.swp
+*.swo
 \#*\#
+.\#*
 *~
 .DS_Store
 auto/
 *.orig
+*.aterm
