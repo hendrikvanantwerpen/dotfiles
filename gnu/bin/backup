@@ -46,7 +46,7 @@ borg create \
     --compression lz4 \
     --chunker-params 19,23,21,4095 \
     --one-file-system \
-    --keep-tag-files \
+    --keep-exclude-tags \
     --exclude-caches \
     --exclude-if-present '@NOBACKUP.TAG' \
     "${BACKUP_OPTS[@]}" \
