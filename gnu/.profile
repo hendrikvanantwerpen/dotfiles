@@ -32,16 +32,23 @@ alias dirs='dirs -v'
 
 # editor
 export EDITOR="emacsclient -t"
+export ALTERNATE_EDITOR="vim"
 export VISUAL="$EDITOR"
 alias edit="$EDITOR"
 
 function emacsd {
     if (($# > 0)); then
         case "$1" in
+            "--help")
+                echo "Usage: emacsd COMMAND"
+                echo "  --start/--daemon   Start Emacs daemon"
+                echo "  --kill/--quit      Quit Emacs daemon"
+                echo "  --help             Show this help"
+                ;;
             "--start"|"--daemon")
                 emacs --daemon
                 ;;
-            "--kill")
+            "--kill"|"--quit")
                 emacsclient -e '(kill-emacs)'
                 ;;
             *)
