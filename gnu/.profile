@@ -34,6 +34,7 @@ alias dirs='dirs -v'
 export EDITOR="emacsclient -t"
 export ALTERNATE_EDITOR="vim"
 export VISUAL="$EDITOR"
+export GIT_EDITOR="$ALTERNATE_EDITOR"
 alias edit="$EDITOR"
 
 function emacsd {
