@@ -71,7 +71,7 @@ case "$CMD" in
     sync)
         BACKUP_HOSTNAME=ch-s010.rsync.net
         rsync \
-            --progress \
+            --info=progress2 \
             --archive \
             --delete \
             "$BACKUP_REPO/." \
