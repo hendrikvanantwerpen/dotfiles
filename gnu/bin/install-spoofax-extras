@@ -105,10 +105,13 @@ fi
 
 declare -A REPOS FEATURES
 
-REPOS[ECLIPSE]=http://download.eclipse.org/releases/neon/
+#REPOS[ECLIPSE]=http://download.eclipse.org/releases/neon/
 
 REPOS[VRAPPER]=http://vrapper.sourceforge.net/update-site/stable/
 FEATURES[VRAPPER]=net.sourceforge.vrapper.feature.group,net.sourceforge.vrapper.plugin.splitEditor.feature.group,net.sourceforge.vrapper.eclipse.jdt.feature.feature.group
+
+REPOS[DOT]=http://download.eclipse.org/tools/gef/updates/releases/
+FEATURES[DOT]=org.eclipse.gef.dot.user.feature.group
 
 #REPOS[BUILDSHIP]=http://download.eclipse.org/buildship/updates/e45/milestones/1.1/
 #FEATURES[BUILDSHIP]=org.eclipse.buildship.feature.group
@@ -116,8 +119,8 @@ FEATURES[VRAPPER]=net.sourceforge.vrapper.feature.group,net.sourceforge.vrapper.
 #REPOS[GRECLIPSE]=http://dist.springsource.org/snapshot/GRECLIPSE/e4.5/
 #FEATURES[GRECLIPSE]=org.codehaus.groovy.eclipse.feature.feature.group,org.codehaus.groovy.headless.feature.feature.group,org.codehaus.groovy.jdt.patch.feature.group,org.codehaus.groovy.m2eclipse.feature.feature.group
 
-REPOS[M2E]=http://download.eclipse.org/technology/m2e/releases/1.6/,http://ifedorenko.github.com/m2e-extras/,http://download.jboss.org/jbosstools/updates/m2e-extensions/m2e-apt
-FEATURES[M2E]=com.ifedorenko.m2e.mavendev.feature.feature.group,org.jboss.tools.maven.apt.feature.feature.group
+#REPOS[M2E]=http://download.eclipse.org/technology/m2e/releases/1.6/,http://ifedorenko.github.com/m2e-extras/,http://download.jboss.org/jbosstools/updates/m2e-extensions/m2e-apt
+#FEATURES[M2E]=com.ifedorenko.m2e.mavendev.feature.feature.group,org.jboss.tools.maven.apt.feature.feature.group
 
 #REPOS[SCALA]=http://download.scala-ide.org/sdk/lithium/e44/scala211/stable/site,http://alchim31.free.fr/m2e-scala/update-site
 #FEATURES[SCALA]=org.scala-ide.sdt.feature.feature.group,org.scala.tools.eclipse.search.feature.feature.group,org.scalaide.worksheet.feature.feature.group,org.scala-ide.sdt.weaving.feature.feature.group,org.maven.ide.eclipse.scala_feature.feature.group
@@ -125,8 +128,8 @@ FEATURES[M2E]=com.ifedorenko.m2e.mavendev.feature.feature.group,org.jboss.tools.
 REPOS[YEDIT]=http://dadacoalition.org/yedit/
 FEATURES[YEDIT]=org.dadacoalition.yedit.feature.feature.group
 
-REPOS[FINDBUGS]=http://findbugs.cs.umd.edu/eclipse/
-FEATURES[FINDBUGS]=edu.umd.cs.findbugs.plugin.eclipse
+#REPOS[FINDBUGS]=http://findbugs.cs.umd.edu/eclipse/
+#FEATURES[FINDBUGS]=edu.umd.cs.findbugs.plugin.eclipse
 
 # join repositories and artifacts
 IFS_OLD="$IFS"

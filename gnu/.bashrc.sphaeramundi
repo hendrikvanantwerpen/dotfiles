@@ -7,6 +7,7 @@ done
 
 export SCALA_HOME="$(brew --prefix scala)/libexec"
 
+export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
 export PATH="/usr/local/opt/texinfo/bin:$PATH"
 
 export GOPATH="$HOME/.go"
