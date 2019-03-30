@@ -68,6 +68,10 @@ case "$CMD" in
             "$BACKUP_TARGET" \
             "${BACKUP_DIRS[@]}"
         ;;
+    check)
+        borg check \
+            "$BACKUP_REPO"
+        ;;
     sync)
         BACKUP_HOSTNAME=ch-s010.rsync.net
         rsync \
