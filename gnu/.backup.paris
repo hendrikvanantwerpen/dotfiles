@@ -1,4 +1,4 @@
-BACKUP_REPO=/data/backup/
+BACKUP_REPO=/media/hendrik/Backup/paris/
 BACKUP_DIRS=( \
     /etc
     /var

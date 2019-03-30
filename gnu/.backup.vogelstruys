@@ -1,0 +1,11 @@
+BACKUP_REPO=/media/hendrik/Backup/vogelstruys/
+BACKUP_DIRS=( \
+    /etc
+    /home/hendrik
+)
+BACKUP_OPTS=( \
+    --exclude-if-present .git
+    --exclude-if-present .svn
+    --exclude-if-present .bzr
+    --exclude-if-present .hg
+)
