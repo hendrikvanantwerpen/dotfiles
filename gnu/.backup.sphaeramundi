@@ -1,4 +1,4 @@
-BACKUP_REPO=/Backup/
+BACKUP_REPO=/Volumes/Backup/sphaeramundi/
 BACKUP_DIRS=( \
     /Users/hendrik
 )

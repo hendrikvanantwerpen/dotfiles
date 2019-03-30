@@ -14,3 +14,5 @@
 	default = simple
 [core]
 	excludesfile = ~/.gitignore_global
+[rerere]
+	enabled = true

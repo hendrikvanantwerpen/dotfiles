@@ -4,6 +4,18 @@ for pkg in coreutils; do
     export PATH="$(brew --prefix $pkg)/libexec/gnubin:$PATH"
     export MANPATH="$(brew --prefix $pkg)/libexec/gnuman:$MANPATH"
 done
+
 export SCALA_HOME="$(brew --prefix scala)/libexec"
+
+export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
+export PATH="/usr/local/opt/texinfo/bin:$PATH"
+
+export GOPATH="$HOME/.go"
+export PATH="/usr/local/opt/go/libexec/bin:$PATH"
+
+export NVM_DIR="$HOME/.nvm"
+. "/usr/local/opt/nvm/nvm.sh"
+
+export PATH="/Applications/mCRL2.app/Contents/bin:$PATH"
 
 alias bsdbash="env -i /bin/bash --noprofile --norc"

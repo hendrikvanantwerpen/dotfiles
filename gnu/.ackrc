@@ -1,6 +1,11 @@
 --type-add=esv=.esv
 --type-add=stratego=.str
+--type-add=nabl=.nabl
+--type-add=dynsem=.ds
+--type-add=ts=.ts
 --type-add=nabl2=.nabl2
+--type-add=sdf3=.sdf3
+--type-add=spt=.spt
 --ignore-file=is:.DS_Store
 --ignore-dir=.cache
 --ignore-dir=target

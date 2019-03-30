@@ -38,18 +38,51 @@ fi
 
 ## Do backup
 
-BACKUP_NAME="$HOSTNAME-$(date +%Y%m%dT%H%M%S)"
-BACKUP_TARGET="$BACKUP_REPO::$BACKUP_NAME" \
+function help {
+    echo "$0 [help|create|sync]"
+}
+function error {
+    echo "$1" >&2
+    help
+    exit 1
+}
 
-borg create \
-    "$@" \
-    --compression lz4 \
-    --chunker-params 19,23,21,4095 \
-    --one-file-system \
-    --keep-tag-files \
-    --exclude-caches \
-    --exclude-if-present '@NOBACKUP.TAG' \
-    "${BACKUP_OPTS[@]}" \
-    "$BACKUP_TARGET" \
-    "${BACKUP_DIRS[@]}"
+if [ $# -lt 1 ]; then
+    error "Missing command"
+fi
+
+CMD=$1
+shift 1
+case "$CMD" in
+    create)
+        BACKUP_NAME="$HOSTNAME-$(date +%Y%m%dT%H%M%S)"
+        BACKUP_TARGET="$BACKUP_REPO::$BACKUP_NAME"
+        borg create \
+            --compression lz4 \
+            --chunker-params 19,23,21,4095 \
+            --one-file-system \
+            --keep-exclude-tags \
+            --exclude-caches \
+            --exclude-if-present '@NOBACKUP.TAG' \
+            "${BACKUP_OPTS[@]}" \
+            "$BACKUP_TARGET" \
+            "${BACKUP_DIRS[@]}"
+        ;;
+    sync)
+        BACKUP_HOSTNAME=ch-s010.rsync.net
+        rsync \
+            --info=progress2 \
+            --archive \
+            --delete \
+            "$BACKUP_REPO/." \
+            "$BACKUP_HOSTNAME:$HOSTNAME/."
+        ;;
+    help)
+        help
+        ;;
+    *)
+        echo "Unknown commnad '$CMD'"
+        help
+        ;;
+esac
 
