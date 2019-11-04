@@ -1,20 +1,21 @@
 # .bashrc.sphaeramundi - Local definitions
 
-for pkg in coreutils; do
-    export PATH="$(brew --prefix $pkg)/libexec/gnubin:$PATH"
-    export MANPATH="$(brew --prefix $pkg)/libexec/gnuman:$MANPATH"
+for pkg in $(brew --prefix coreutils findutils gawk gnu-{indent,sed,tar} grep); do
+    export PATH="$pkg/libexec/gnubin:$PATH"
+    export MANPATH="$pkg/libexec/gnuman:$MANPATH"
 done
 
 export SCALA_HOME="$(brew --prefix scala)/libexec"
 
-export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
-export PATH="/usr/local/opt/texinfo/bin:$PATH"
+for pkg in $(brew --prefix gnu-getopt ruby texinfo); do
+    export PATH="$pkg/bin:$PATH"
+done
 
 export GOPATH="$HOME/.go"
-export PATH="/usr/local/opt/go/libexec/bin:$PATH"
+export PATH="$(brew --prefix go)/libexec/bin:$PATH"
 
 export NVM_DIR="$HOME/.nvm"
-. "/usr/local/opt/nvm/nvm.sh"
+. "$(brew --prefix nvm)/nvm.sh"
 
 export PATH="/Applications/mCRL2.app/Contents/bin:$PATH"
 

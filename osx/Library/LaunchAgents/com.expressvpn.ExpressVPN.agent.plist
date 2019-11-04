@@ -9,9 +9,9 @@
   <key>EnvironmentVariables</key>
     <dict>
       <key>XVPN_CLIENT_VERSION</key>
-      <string>6.7.3</string>
+      <string>7.3.1</string>
       <key>XVPN_CLIENT_BUILD</key>
-      <string>3774</string>
+      <string>6487</string>
       <key>XVPN_STAGING</key>
       <string></string>
       <key>XVPN_WORK_DIR</key>

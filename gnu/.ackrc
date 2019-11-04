@@ -6,6 +6,7 @@
 --type-add=nabl2=.nabl2
 --type-add=sdf3=.sdf3
 --type-add=spt=.spt
+--type-add=pom=pom.xml
 --ignore-file=is:.DS_Store
 --ignore-dir=.cache
 --ignore-dir=target

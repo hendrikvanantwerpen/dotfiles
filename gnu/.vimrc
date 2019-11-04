@@ -4,6 +4,7 @@ set smartindent
 set expandtab
 set number
 set foldmethod=syntax
+set nowrap
 imap <S-Tab> <C-o><<
 nmap <S-Left> <C-W><Left>
 nmap <S-Right> <C-W><Right>

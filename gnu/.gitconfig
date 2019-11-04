@@ -7,6 +7,7 @@
 	branch = auto
 	ui = true
 [diff]
+    tool = kdiff3
     compactionHeuristic = true
 [merge]
 	defaultToUpstream = true
