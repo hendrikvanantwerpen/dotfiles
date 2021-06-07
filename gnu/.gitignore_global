@@ -6,6 +6,6 @@
 .DS_Store
 auto/
 *.orig
-*.aterm
 .statix
 *.log
+*.pyc

@@ -22,5 +22,7 @@ call pathogen#infect()
 call pathogen#helptags()
 
 syntax on
+set synmaxcol=256
+
 filetype plugin indent on
 let javascript_enable_domhtmlcss=1 

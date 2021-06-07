@@ -11,6 +11,10 @@ for pkg in $(brew --prefix gnu-getopt ruby texinfo); do
     export PATH="$pkg/bin:$PATH"
 done
 
+for pkg in $(brew --prefix mtr); do
+    export PATH="$pkg/sbin:$PATH"
+done
+
 export GOPATH="$HOME/.go"
 export PATH="$(brew --prefix go)/libexec/bin:$PATH"
 

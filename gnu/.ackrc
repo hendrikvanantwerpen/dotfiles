@@ -7,6 +7,11 @@
 --type-add=sdf3=.sdf3
 --type-add=spt=.spt
 --type-add=pom=pom.xml
+--type-add=stx=.stx
+--type-add=stxtest=.stxtest
+--type-add=statix=.stx,.stxtest
+--type-add=pom:is:pom.xml
+--type-add=bibtex=.bib
 --ignore-file=is:.DS_Store
 --ignore-dir=.cache
 --ignore-dir=target
