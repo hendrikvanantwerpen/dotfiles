@@ -5,8 +5,12 @@ eval "$(scalaenv init -)"
 eval "$(rbenv init -)"
 source_if_exists "$HOME/.nix-profile/etc/profile.d/nix.sh"
 
-export SDKMAN_DIR="/Users/hendrik/.sdkman"
-. "$HOME/.sdkman/bin/sdkman-init.sh"
+export SDKMAN_DIR="/usr/local/sdkman"
+if [ -d "$SDKMAN_DIR" ]; then
+  . "$SDKMAN_DIR/bin/sdkman-init.sh"
+else
+  echo "Warning: Missing SDKMAN in $SDKMAN_DIR"
+fi
 
 export LC_ALL="en_US.UTF-8"
 
