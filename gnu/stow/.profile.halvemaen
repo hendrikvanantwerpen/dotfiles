@@ -1,0 +1,27 @@
+# .profile.halvemaen - Local definitions
+
+source_if_exists "$(brew --prefix)/etc/bash_completion"
+if ! command -v scalaenv >&/dev/null; then
+  echo "Warning: Missing scalaenv"
+else
+  eval "$(scalaenv init -)"
+fi
+if ! command -v rbenv >&/dev/null; then
+  echo "Warning: Missing rbenv"
+else
+  eval "$(rbenv init -)"
+fi
+source_if_exists "$HOME/.nix-profile/etc/profile.d/nix.sh"
+
+export SDKMAN_DIR="/usr/local/sdkman"
+if [ -d "$SDKMAN_DIR" ]; then
+  source_if_exists "$SDKMAN_DIR/bin/sdkman-init.sh"
+else
+  echo "Warning: Missing SDKMAN in $SDKMAN_DIR"
+fi
+
+export LC_ALL="en_US.UTF-8"
+
+alias showFiles='defaults write com.apple.finder AppleShowAllFiles YES'
+alias hideFiles='defaults write com.apple.finder AppleShowAllFiles NO'
+alias doppio="caffeinate -disu"

@@ -14,7 +14,11 @@ fi
 
 # Git aware prompt
 export GITAWAREPROMPT="$HOME/.bash/git-aware-prompt"
-. $GITAWAREPROMPT/main.sh
+if ! test -d $GITAWAREPROMPT; then
+  echo "Warning: Missing $GITAWAREPROMPT"
+else
+  source_if_exists $GITAWAREPROMPT/main.sh
+fi
 
 # Set prompt
 export PS1="\u@\h:\w\[$txtcyn\]\$git_branch\[$txtylw\]\$git_dirty\[$txtrst\]\$ "
@@ -76,4 +80,4 @@ alias timestamp='date +%Y%m%dT%H%M%S'
 export JAVA_TOOL_OPTIONS="-Djava.awt.headless=true"
 
 # Source local definitions
-source_if_exists "$HOME/.profile.`hostname`"
+source_if_exists "$HOME/.profile.`hostname -s`"

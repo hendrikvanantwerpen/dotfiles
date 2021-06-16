@@ -1,0 +1,26 @@
+# .bashrc.halvemaen - Local definitions
+
+for pkg in $(brew --prefix coreutils findutils gawk gnu-{indent,sed,tar} grep); do
+    export PATH="$pkg/libexec/gnubin:$PATH"
+    export MANPATH="$pkg/libexec/gnuman:$MANPATH"
+done
+
+export SCALA_HOME="$(brew --prefix scala)/libexec"
+
+for pkg in $(brew --prefix gnu-getopt ruby texinfo); do
+    export PATH="$pkg/bin:$PATH"
+done
+
+for pkg in $(brew --prefix mtr); do
+    export PATH="$pkg/sbin:$PATH"
+done
+
+export GOPATH="$HOME/.go"
+export PATH="$(brew --prefix go)/libexec/bin:$PATH"
+
+export NVM_DIR="$HOME/.nvm"
+source_if_exists "$(brew --prefix nvm)/nvm.sh"
+
+export PATH="/Applications/mCRL2.app/Contents/bin:$PATH"
+
+alias bsdbash="env -i /bin/bash --noprofile --norc"

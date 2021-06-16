@@ -6,3 +6,10 @@ source_if_exists()
         . "$1"
     fi
 }
+
+exec_if_exists()
+{
+    if command -v "$1" >&/dev/null; then
+        "$@"
+    fi
+}
