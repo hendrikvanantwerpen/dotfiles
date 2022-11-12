@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+## Convenience script for running dotfile related scripts. This can be
+## linked into $HOME/bin and will automagically figure out the location of
+## the dotfiles directory.
+
+# As per https://stackoverflow.com/a/246128
+SOURCE=${BASH_SOURCE[0]}
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR=$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
+  SOURCE=$(readlink "$SOURCE")
+  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DF_DIR=$( cd -P "$( dirname "$SOURCE" )/.." >/dev/null 2>&1 && pwd )
+
+if [ $# -lt 1 ]; then
+    echo "Usage: dotfiles COMMAND"
+    echo ""
+    echo "Commands:"
+    echo ""
+    (cd "$DF_DIR/script/" || return; find . -name .git -prune -o -type f -perm /111 -print) | while IFS= read -r cmd; do
+        printf "    %-26s" "${cmd#./}"
+        sed -n "2{s/^#\+//;p;q}" "$DF_DIR/script/$cmd"
+    done
+    echo ""
+    exit 0
+fi
+
+cmd=$1
+shift 1
+script="$DF_DIR/script/$cmd"
+if [ ! -x "$script" ]; then
+    echo "Command $cmd not found. Missing $script" 2>&1
+    exit 1
+fi
+"$script" "$@"

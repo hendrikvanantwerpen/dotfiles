@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+## Path to dotfiles directory
+
+set -eu
+
+if [ -n "${DF_DIR+set}" ]; then
+    if [ ! -f "$DF_DIR/.dotfiles" ]; then
+        echo "Provided \$DF_DIR $DF_DIR not a dotfiles directory: missing .dotfiles" 1>&2
+        exit 1
+    fi
+else
+    DF_DIR=$(cd -P "$(dirname "$0")/.." >/dev/null 2>&1 && pwd)
+    if [ ! -f "$DF_DIR/.dotfiles" ]; then
+        echo "Script $0 not located in the script directory of a dotfiles directory: missing .dotfiles" 1>&2
+        exit 1
+    fi
+fi
+
+printf "%s\n" "%DF_DIR"

@@ -1,0 +1,76 @@
+#!/usr/bin/env sh
+## Teardown and remove dotfiles
+
+set -eu
+
+if [ -n "${DF_DIR+set}" ]; then
+    if [ ! -f "$DF_DIR/.dotfiles" ]; then
+        echo "Provided \$DF_DIR $DF_DIR not a dotfiles directory: missing .dotfiles" 1>&2
+        exit 1
+    fi
+else
+    DF_DIR=$(cd -P "$(dirname "$0")/.." >/dev/null 2>&1 && pwd)
+    if [ ! -f "$DF_DIR/.dotfiles" ]; then
+        echo "Script $0 not located in the script directory of a dotfiles directory: missing .dotfiles" 1>&2
+        exit 1
+    fi
+fi
+
+. "$DF_DIR/script/lib"
+
+df_log "teardown ($df_rev)"
+
+mods=
+while [ $# -gt 0 ]; do
+    arg="$1"
+    shift 1
+    case "$arg" in
+        -m|--module)
+            if [ $# -lt 1 ]; then
+                df_panic "Missing module name after $arg"
+            fi
+            mod="$1"
+            shift 1
+            if ! df_is_dir "$DF_DIR/modules/$mod"; then
+                df_panic "Module $mod does not exist"
+            fi
+            mods="$(printf "%s%s%s" "$mods" "${mods:+\n}" "$mod")"
+            ;;
+        -N|--dry-run)
+            df_set_dry_run
+            ;;
+        -v|--verbose)
+            df_set_verbose
+            ;;
+        *)
+            df_panic "Unexpected argument: $arg"
+            ;;
+    esac
+done
+
+if [ -n "$mods" ]; then
+    echo "$mods"
+else
+    df_find_dirs_in "$DF_DIR/modules"
+fi | while IFS= read -r mod; do
+    if df_is_dir "$mod"; then
+        continue
+    fi
+    $df_verbose "Module: $mod"
+    if [ -z "$mods" ] && (df_exists "$DF_DIR/modules/.$mod.skip" || df_exists "$DF_DIR/modules/$mod/.skip"); then
+        $df_verbose "skipped: use -m $mod to select"
+        continue
+    fi
+    export DF_MOD_DIR="$DF_DIR/modules/$mod"
+
+    df_source_if_exists "$DF_MOD_DIR/pre-teardown"
+
+    df_forall_symlinks "$DF_MOD_DIR/home" "$HOME" df_symlink_uninstall
+    df_forall_symlinks "$DF_MOD_DIR/local" /usr/local df_symlink_uninstall
+
+    df_source_if_exists "$DF_MOD_DIR/post-teardown"
+done
+
+echo "Local dotfiles command kept installed."
+echo "Uninstall manually using:"
+echo "    rm -f $HOME/bin/dotfiles"

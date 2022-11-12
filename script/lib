@@ -1,0 +1,556 @@
+## dotfiles lib
+
+if [ -z ${DF_DIR+x} ] || [ ! -d "$DF_DIR" ]; then
+    echo "Required environment variable DF_DIR is empty. Sourced from outside a dotfiles script?" 1>&2
+    exit 1
+fi
+if [ ! -f "$DF_DIR/.dotfiles" ]; then
+    echo "Provided variable DF_DIR $DF_DIR is not a dotfiles directory. Missing .dotfiles" 1>&2
+    exit 1
+fi
+
+
+## Control dry or actual run
+
+df_set_dry_run() {
+    df_run=df_print_run
+}
+
+df_print_run() (
+    sep=
+    for arg in "$@"; do
+        printf '%s%s' "$sep" "$(df_shellescape "$arg")"
+        sep=' '
+    done
+    printf '\n'
+)
+
+df_shellescape() (
+    printf '%s\n' "$@" | sed -e 's/[^a-zA-Z0-9,._+@%/-]/\\&/g'
+)
+
+df_utc_now() (
+    date -u +%Y%m%dT%H%M%S
+)
+
+df_confirm() (
+    printf "%s" "$1 [y/n] "
+    IFS= read -r reply
+    case "$reply" in
+        y|yes|Y|Yes)
+            true
+            ;;
+        n|no|N|No)
+            false
+            ;;
+        *)
+            df_error "Unexpected reply: $reply"
+            df_confirm "$1"
+    esac
+)
+
+
+## Logging
+
+df_set_verbose() {
+    # shellcheck disable=SC2209
+    df_verbose=echo
+}
+
+df_log() (
+    printf "[%s] %s\n" "$(date)" "$1" >>"$df_log_file"
+)
+
+df_error() (
+    printf 'ERROR %s\n' "$@" 1>&2
+)
+
+df_warning() (
+    printf 'WARN %s\n' "$@" 1>&2
+)
+
+df_panic() (
+    df_error "$@"
+    exit 1
+)
+
+
+## Paths
+
+# User-friendly path formatting, which uses ~ for $HOME if possible
+df_homify() (
+    home="$(printf "%s" "$HOME" | sed -e 's/\//\\\//g')"
+    printf "%s" "$1" | sed -e "s/^$home/~/"
+)
+
+# Absolute path
+df_abspath() (
+    printf "%s" "$(cd "$(dirname "$1")" || exit ; pwd -P)/$(basename "$1")"
+)
+
+# Real path for a symlink (not for other file types!)
+df_realpath() (
+    # this only resolves one step (we cannot use -f on macOS), but
+    # that should be enough for our purpose
+    readlink "$1"
+)
+
+# Check if a symlink, file, or directory exists.
+# Symlinks succeed even if their target does not exist.
+df_exists() {
+    [ -L "$1" ] || [ -e "$1" ]
+}
+
+# Check if path is a symlink.
+# Symlinks succeed even if their target does not exist.
+df_is_symlink() {
+    [ -L "$1" ]
+}
+
+# Check if path is a symlink to the given file.
+df_is_symlink_to() {
+    [ -L "$1" ] && [ "$(df_realpath "$1")" = "$2" ]
+}
+
+# Check if path is a file.
+# Does not succeed on symlinks to files.
+df_is_file() {
+    [ ! -L "$1" ] && [ -f "$1" ]
+}
+
+# Check if path is or links to a file.
+# Succeeds on symlinks to files.
+df_is_or_links_file() {
+    [ -f "$1" ]
+}
+
+# Check if path is or links to a copy of the given file.
+# Succeeds on symlinks to files.
+df_is_or_links_copy_of() {
+    [ -f "$1" ] && [ -f "$2" ] && [ "$($df_shasum "$1")" = "$($df_shasum "$2")" ]
+}
+
+# Check if path is a directory.
+# Does not succeed on symlinks to directory.
+df_is_dir() {
+    [ ! -L "$1" ] && [ -d "$1" ]
+}
+
+# Check if path is or links to a directory.
+# Succeeds on symlinks to directory.
+df_is_or_links_dir() {
+    [ -d "$1" ]
+}
+
+df_find_dirs_in() (
+    root="$1"
+    (cd "$root" || return; find . -type d ! -name . -prune) | sort | while IFS= read -r dir; do
+        printf "%s\n" "${dir#./}"
+    done
+)
+
+## Checks
+
+df_has_commands() (
+    for cmd in "$@"; do
+        if ! command -v "$cmd" >/dev/null 2>&1; then
+            return 1
+        fi
+    done
+)
+
+df_require_commands() (
+    for cmd in "$@"; do
+        if ! df_has_commands "$cmd"; then
+            df_panic "Missing required command: $cmd"
+        fi
+    done
+)
+
+# check if commands exist, and warn about missing commands
+# for use in conditionals that invoke the commands so the
+# error case can be omitted
+df_with_commands() (
+    for cmd in "$@"; do
+        if ! df_has_commands "$cmd"; then
+            df_panic "Missing required command: $cmd"
+            return 1
+        fi
+    done
+)
+
+
+## Source
+##
+## Careful: these should not be subshell functions!
+
+df_source_all() {
+    src="$1"
+    df_source_if_exists "${src}"
+    df_source_if_exists "${src}[os=$df_os]"
+    df_source_if_exists "${src}[os=$df_os,arch=$df_arch]"
+    df_source_if_exists "${src}[host=$df_hostname]"
+}
+
+df_source_if_exists() {
+    src="$1"
+    if df_is_or_links_file "$src"; then
+        # shellcheck disable=SC1090
+        . "$src"
+    fi
+}
+
+df_source() {
+    src="$1"
+    # shellcheck disable=SC1090
+    df_is_or_links_file "$src" && . "$src"
+}
+
+
+## Symlinks
+
+df_forall_symlinks() (
+    src="$1"
+    tgt="$2"
+    cmd="$3"
+    df_exec_symlinks "$src" "$tgt" "$cmd" "host=$df_hostname"
+    df_exec_symlinks "$src" "$tgt" "$cmd" "os=$df_os,arch=$df_arch"
+    df_exec_symlinks "$src" "$tgt" "$cmd" "os=$df_os"
+    df_exec_symlinks "$src" "$tgt" "$cmd" ""
+)
+
+df_exec_symlinks() (
+    src="$1"
+    tgt="$2"
+    cmd="$3"
+    find_ext=.symlink
+    basename_ext=.symlink
+    if [ -n "$4" ]; then
+        find_ext="$find_ext\[$4\]"
+        basename_ext="${basename_ext}[$4]"
+    fi
+
+    # This is unsafe when filenames contain newlines.
+    # So I guess we just shouldn't do that...
+    (cd "$src" || return ; find . -name .git -prune -o -name "*$find_ext" -print) 2>/dev/null | while IFS= read -r file; do
+        f="${file#./}"
+        d="$(dirname "$file")/"
+        d="${d#./}"
+        t="$(basename "$f" "$basename_ext")"
+        "$cmd" "$src/$f" "$tgt/$d$t"
+    done
+)
+
+df_symlink_status() (
+    src="$1"
+    tgt="$2"
+    if ! df_exists "$tgt"; then
+        echo "$(df_homify "$tgt"): not installed"
+    elif df_is_symlink_to "$tgt" "$src"; then
+        $df_verbose "$(df_homify "$tgt"): installed"
+    elif df_is_or_links_copy_of "$tgt" "$src"; then
+        echo "$(df_homify "$tgt"): copy, can replace with link"
+    else
+        echo "$(df_homify "$tgt"): conflict, cannot install"
+    fi
+)
+
+df_symlink_install() (
+    src="$1"
+    tgt="$2"
+    if df_is_symlink_to "$tgt" "$src"; then
+        $df_verbose "$(df_homify "$tgt"): already installed"
+        return
+    elif df_is_or_links_copy_of "$tgt" "$src"; then
+        df_warning "$(df_homify "$tgt"): copy, replaced"
+        if ! $df_run rm -f "$tgt" 2>/dev/null; then
+            df_error "$(df_homify "$tgt"): removing copy failed, not replaced"
+            return
+        fi
+    elif df_exists "$tgt"; then
+        df_error "$(df_homify "$tgt"): conflict, not installed"
+        return
+    fi
+    dir="$(dirname "$tgt")"
+    if df_exists "$dir" && ! df_is_or_links_dir "$dir"; then
+        df_error "$(df_homify "$tgt"): parent is not a directory"
+        return
+    fi
+    if ! df_exists "$dir"; then
+        if ! $df_run mkdir -p "$dir" 2>/dev/null; then
+            df_error "$(df_homify "$tgt"): cannot create parent directory"
+            return
+        fi
+    fi
+    df_try_link "$src" "$tgt"
+)
+
+df_symlink_uninstall() (
+    src="$1"
+    tgt="$2"
+    if df_is_symlink_to "$tgt" "$src"; then
+        df_try_unlink "$tgt"
+    elif df_is_or_links_copy_of "$tgt" "$src"; then
+        df_warning "$(df_homify "$tgt"): copy, not removed"
+    elif df_exists "$tgt"; then
+        df_error "$(df_homify "$tgt"): conflict, not removed"
+    else
+        $df_verbose "$(df_homify "$tgt"): already removed"
+    fi
+)
+
+df_symlink_intern() (
+    if [ -n "$4" ]; then
+        ext="$ext\[$4\]"
+    fi
+    src="$1/$3.$ext"
+    tgt="$2/$3"
+    ext=.symlink
+    if ! df_exists "$tgt"; then
+        df_error "$(df_homify "$tgt"): does not exist"
+        return
+    elif df_is_symlink_to "$tgt" "$src"; then
+        $df_verbose "$(df_homify "$tgt"): already linked"
+        return
+    elif df_is_or_links_copy_of "$tgt" "$src"; then
+        if ! $df_run rm -f "$tgt" 2>/dev/null; then
+            df_error "$(df_homify "$tgt"): removing copy failed, not interned"
+            return
+        fi
+        df_warning "$(df_homify "$tgt"): copy, replaced"
+    elif df_exists "$src"; then
+        df_error "$(df_homify "$tgt"): conflict, cannot intern"
+        return
+    else
+        if ! $df_run mv "$tgt" "$src" 2>/dev/null; then
+            df_error "$(df_homify "$tgt"): moving file failed, not interned"
+            return
+        fi
+    fi
+    df_try_link "$src" "$tgt"
+)
+
+df_try_link() (
+    src="$1"
+    tgt="$2"
+    if ! $df_run ln -s "$src" "$tgt" 2>/dev/null; then
+        df_error "Failed to link $tgt -> $src"
+    fi
+)
+
+df_try_unlink() (
+    tgt="$1"
+    if ! df_is_symlink "$tgt"; then
+        df_error "Failed to unlink non-link $tgt"
+        return
+    fi
+    if ! $df_run rm -f "$tgt" 2>/dev/null; then
+        df_error "Failed to remove link $tgt"
+    fi
+)
+
+
+## Homebrew
+
+df_macos_brew_bundle() (
+    brewfile="$1"
+    $df_run "$df_macos_brew" bundle --file="$brewfile" --no-upgrade --no-lock
+)
+
+
+## Services
+
+df_macos_service_is_homebrew() (
+    label="$1"
+    case "$label" in
+        homebrew.mxcl.*)
+            exit 0
+            ;;
+        *)
+            exit 1
+            ;;
+    esac
+)
+
+df_macos_plist_label() (
+    plist="$1"
+    /usr/libexec/PlistBuddy -c 'print Label' "$plist"
+)
+
+df_macos_service_target() (
+    service="$1"
+    printf '%s/%s\n' "$df_macos_domain_target" "$service"
+)
+
+df_macos_service_path() (
+    service="$1"
+    find "$df_macos_services_dir" -name '*.plist' | while IFS= read -r plist; do
+        label="$(df_macos_plist_label "$plist")"
+        if [ "$label" = "$service" ]; then
+            printf '%s\n' "$plist"
+            exit 1
+        fi
+    done || exit 0
+    exit 1
+)
+
+df_macos_services_list() (
+    find "$df_macos_services_dir" -name '*.plist' | sort | while IFS= read -r plist; do
+        label="$(df_macos_plist_label "$plist")"
+        if ! df_macos_service_is_homebrew "$label"; then
+            printf '%s\n' "$label"
+        else
+            printf '%-32s * managed with: brew services\n' "$label"
+        fi
+    done
+)
+
+df_macos_service_status() (
+    service="$1"
+    target="$(df_macos_service_target "$service")"
+    if launchctl print "$target" >/dev/null 2>&1; then
+        exit 0
+    else
+        exit 1
+    fi
+)
+
+df_macos_service_enable() (
+    service="$1"
+    if ! path="$(df_macos_service_path "$service")"; then
+        df_panic "Cannot find path for service $service"
+    fi
+    if ! launchctl bootstrap "$df_macos_domain_target" "$path" ; then
+        df_error "Enabling service $service failed"
+    fi
+)
+
+df_macos_service_disable() (
+    service="$1"
+    target="$(df_macos_service_target "$service")"
+    if ! launchctl bootout "$target" ; then
+        df_error "Disabling service $service failed"
+    fi
+)
+
+df_macos_service_restart() (
+    service="$1"
+    target="$(df_macos_service_target "$service")"
+    if ! launchctl kickstart -k "$target" ; then
+        df_error "Restarting service $service failed"
+    fi
+)
+
+
+## SHA
+
+df_macos_shasum() (
+    shasum -a256 "$1" | cut -c-64
+)
+
+df_linux_shasum() (
+    sha256sum "$1" | cut -c-64
+)
+
+
+## Login items
+
+df_macos_login_items() (
+    osascript -e 'tell application "System Events" to get the name of every login item' | sed -e 's/, /\n/g'
+)
+
+df_macos_add_login_item() (
+    path="$1"
+    if ! df_exists "$path"; then
+        df_error "Login item application does not exist: $path"
+    fi
+    osascript -e "tell application \"System Events\" to make login item at end with properties {path:\"$path\", hidden:false}" >/dev/null 2>&1
+)
+
+df_macos_remove_login_item() (
+    path="$1"
+    name="$(basename "$path" .app)"
+    if ! df_macos_login_items | grep "$name" >/dev/null 2>&1; then
+        $df_verbose "Login item already removed: $name"
+        return 0
+    fi
+    osascript -e "tell application \"System Events\" to delete login item \"$1\"" >/dev/null 2>&1
+)
+
+df_macos_ensure_login_item() (
+    path="$1"
+    name="$(basename "$path" .app)"
+    if ! df_macos_login_items | grep "$name" >/dev/null 2>&1; then
+        df_macos_add_login_item "$path"
+        open --background "$path"
+    fi
+)
+
+df_on_macos() {
+    [ "$df_os" = "macos" ]
+}
+
+## General variables
+## Not meant to be overridden!
+
+## Used to dry/active run (if empty, run is active)
+df_run=
+
+## Used to control verbose output
+df_verbose=true
+
+## log file location
+df_log_file="$HOME/.dotfiles.log"
+
+## current dotfiles revision
+# shellcheck disable=SC2034
+df_rev="$(git -C "$DF_DIR" rev-parse HEAD)"
+
+## current hostname
+# shellcheck disable=SC2034
+df_hostname="$(hostname -s)"
+
+## current os
+# shellcheck disable=SC2034
+df_os=unknown
+case "$(uname -s)" in
+    Linux*)
+        # shellcheck disable=SC2034
+        df_os=linux
+        ;;
+    Darwin*)
+        # shellcheck disable=SC2034
+        df_os=macos
+        ;;
+    *)
+        df_panic "Unsupported OS: $(uname -s)"
+        ;;
+esac
+df_arch="$(uname -m)"
+
+## os specific values
+case "$df_os" in
+    linux)
+        df_shasum=df_linux_shasum
+        ;;
+    macos)
+        df_shasum=df_macos_shasum
+        case "$df_arch" in
+            x86_64)
+                df_macos_brew=/usr/local/bin/brew
+                ;;
+            arm64)
+                df_macos_brew=/opt/homebrew/bin/brew
+                ;;
+        esac
+        ;;
+esac
+
+
+## services location
+df_macos_services_dir="$HOME/Library/LaunchAgents"
+df_macos_domain_target="gui/$(id -u)"
+
+## General assertions and variables
+df_require_commands find git
+

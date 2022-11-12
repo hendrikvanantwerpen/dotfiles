@@ -1,0 +1,84 @@
+#!/usr/bin/env sh
+## Manage services
+
+set -eu
+
+if [ -n "${DF_DIR+set}" ]; then
+    if [ ! -f "$DF_DIR/.dotfiles" ]; then
+        echo "Provided \$DF_DIR $DF_DIR not a dotfiles directory: missing .dotfiles" 1>&2
+        exit 1
+    fi
+else
+    DF_DIR=$(cd -P "$(dirname "$0")/.." >/dev/null 2>&1 && pwd)
+    if [ ! -f "$DF_DIR/.dotfiles" ]; then
+        echo "Script $0 not located in the script directory of a dotfiles directory: missing .dotfiles" 1>&2
+        exit 1
+    fi
+fi
+
+. "$DF_DIR/script/lib"
+
+if [ "$df_os" != macos ]; then
+    df_panic "Only supported on macOS"
+fi
+
+usage_panic() (
+    cat <<-USAGE
+		Usage: $0 COMMAND ARGS...
+
+		Commands:
+
+		    list
+		    status SERVICE
+		    enable SERVICE
+		    disable SERVICE
+		    restart SERVICE
+
+		USAGE
+    df_panic "$@"
+)
+
+if [ $# -lt 1 ]; then
+    usage_panic "Missing command argument"
+fi
+cmd="$1"
+shift 1
+
+case "$cmd" in
+    list)
+        df_macos_services_list
+        ;;
+    status|enable|disable|restart)
+        if [ $# -ne 1 ]; then
+            usage_panic "Missing service argument"
+        fi
+        service="$1"
+
+        if df_macos_service_is_homebrew "$service"; then
+            df_panic "Homebrew services are managed with: brew services"
+        fi
+
+        case "$cmd" in
+            status)
+                if df_macos_service_status "$service"; then
+                    echo "$service is enabled"
+                else
+                    echo "$service is not enabled"
+                fi
+                ;;
+            enable)
+                df_macos_service_enable "$service"
+                ;;
+            disable)
+                df_macos_service_disable "$service"
+                ;;
+            restart)
+                df_macos_service_restart "$service"
+                ;;
+        esac
+
+        ;;
+    *)
+        usage_panic "Unknown command: $cmd"
+        ;;
+esac

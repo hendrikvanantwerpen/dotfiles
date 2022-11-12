@@ -1,0 +1,107 @@
+#!/usr/bin/env sh
+## Setup and install dotfiles
+
+set -eu
+
+if [ -n "${DF_DIR+set}" ]; then
+    if [ ! -f "$DF_DIR/.dotfiles" ]; then
+        echo "Provided \$DF_DIR $DF_DIR not a dotfiles directory: missing .dotfiles" 1>&2
+        exit 1
+    fi
+else
+    DF_DIR=$(cd -P "$(dirname "$0")/.." >/dev/null 2>&1 && pwd)
+    if [ ! -f "$DF_DIR/.dotfiles" ]; then
+        echo "Script $0 not located in the script directory of a dotfiles directory: missing .dotfiles" 1>&2
+        exit 1
+    fi
+fi
+
+. "$DF_DIR/script/lib"
+
+df_log "setup ($df_rev)"
+
+mods=
+while [ $# -gt 0 ]; do
+    arg="$1"
+    shift 1
+    case "$arg" in
+        -m|--module)
+            if [ $# -lt 1 ]; then
+                df_panic "Missing module name after $arg"
+            fi
+            mod="$1"
+            shift 1
+            if ! df_is_dir "$DF_DIR/modules/$mod"; then
+                df_panic "Module $mod does not exist"
+            fi
+            mods="$(printf "%s%s%s" "$mods" "${mods:+\n}" "$mod")"
+            ;;
+        -N|--dry-run)
+            df_set_dry_run
+            ;;
+        -v|--verbose)
+            df_set_verbose
+            ;;
+        *)
+            df_panic "Unexpected argument: $arg"
+            ;;
+    esac
+done
+
+if df_on_macos; then
+    if ! pkgutil --pkg-info=com.apple.pkg.CLTools_Executables >/dev/null 2>&1 || ! df_exists "$(xcode-select --print-path)/usr/bin/make"; then
+        df_warning "XCode Command Line Tools not installed. Running installer..."
+        $df_run xcode-select --install
+        if ! df_confirm "Did XCode Command Line Tools install succeed?"; then
+            exit 1
+        fi
+    fi
+
+    if ! df_with_commands $df_macos_brew; then
+        df_warning "Homebrew not installed."
+        if ! df_confirm "Install Homebrew?"; then
+            exit 1
+        fi
+        /bin/bash -c "$(/usr/bin/curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+fi
+
+df_symlink_install "$DF_DIR/bin/dotfiles.symlink" "$HOME/bin/dotfiles"
+
+if [ -n "$mods" ]; then
+    echo "$mods"
+else
+    df_find_dirs_in "$DF_DIR/modules"
+fi | while IFS= read -r mod; do
+    if df_is_dir "$mod"; then
+        continue
+    fi
+    $df_verbose "Module: $mod"
+    if [ -z "$mods" ] && (df_exists "$DF_DIR/modules/.$mod.skip" || df_exists "$DF_DIR/modules/$mod/.skip"); then
+        $df_verbose "skipped: use -m $mod to select"
+        continue
+    fi
+    export DF_MOD_DIR="$DF_DIR/modules/$mod"
+
+    df_source_if_exists "$DF_MOD_DIR/pre-setup"
+
+    if df_on_macos; then
+        if df_is_file "$DF_MOD_DIR/macos/Brewfile"; then
+            if ! df_macos_brew_bundle "$DF_MOD_DIR/macos/Brewfile"; then
+                df_warning "Bundle install failed."
+                if ! df_confirm "Continue setup?"; then
+                    exit 1
+                fi
+            fi
+        fi
+    fi
+
+    df_forall_symlinks "$DF_MOD_DIR/home" "$HOME" df_symlink_install
+    df_forall_symlinks "$DF_MOD_DIR/local" /usr/local df_symlink_install
+
+    if df_on_macos; then
+        df_source_if_exists "$DF_MOD_DIR/macos/defaults"
+    fi
+
+    df_source_if_exists "$DF_MOD_DIR/post-setup"
+done

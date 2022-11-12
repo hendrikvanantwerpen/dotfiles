@@ -1,0 +1,70 @@
+#!/usr/bin/env sh
+## Intern and link files
+
+set -eu
+
+if [ -n "${DF_DIR+set}" ]; then
+    if [ ! -f "$DF_DIR/.dotfiles" ]; then
+        echo "Provided \$DF_DIR $DF_DIR not a dotfiles directory: missing .dotfiles" 1>&2
+        exit 1
+    fi
+else
+    DF_DIR=$(cd -P "$(dirname "$0")/.." >/dev/null 2>&1 && pwd)
+    if [ ! -f "$DF_DIR/.dotfiles" ]; then
+        echo "Script $0 not located in the script directory of a dotfiles directory: missing .dotfiles" 1>&2
+        exit 1
+    fi
+fi
+
+. "$DF_DIR/script/lib"
+
+
+df_log "intern ($df_rev)"
+
+guard=
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -N|--dry-run)
+            df_set_dry_run
+            ;;
+        --host)
+            if [ -n "$guard" ]; then
+                df_panic "Multiple guards specified."
+            fi
+            guard="host=$df_hostname"
+            ;;
+        --os)
+            if [ -n "$guard" ]; then
+                df_panic "Multiple guards specified."
+            fi
+            guard="os=$df_os"
+            ;;
+        -v|--verbose)
+            df_set_verbose
+            ;;
+        *)
+            break
+            ;;
+    esac
+    shift 1
+done
+
+if [ $# -lt 1 ]; then
+    df_panic "No files specified to intern."
+fi
+
+for tgt in "$@"; do
+    tgt="$(df_abspath "$tgt")"
+    case "$tgt" in
+        "$HOME"/*)
+            file="${tgt#"$HOME"/}"
+            df_symlink_intern "$DF_DIR/home" "$HOME" "$file" "$guard"
+            ;;
+        /usr/local/*)
+            file="${tgt#$/usr/local/}"
+            df_symlink_intern "$DF_DIR/local" /usr/local "$file" "$guard"
+            ;;
+        *)
+            df_error "$(df_homify "$tgt"): not contained in \$HOME or /usr/local"
+    esac
+done
