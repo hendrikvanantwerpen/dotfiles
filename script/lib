@@ -464,7 +464,7 @@ df_macos_add_login_item() (
     if ! df_exists "$path"; then
         df_error "Login item application does not exist: $path"
     fi
-    osascript -e "tell application \"System Events\" to make login item at end with properties {path:\"$path\", hidden:false}" >/dev/null 2>&1
+    $df_run osascript -e "tell application \"System Events\" to make login item at end with properties {path:\"$path\", hidden:false}" >/dev/null 2>&1
 )
 
 df_macos_remove_login_item() (
@@ -474,7 +474,7 @@ df_macos_remove_login_item() (
         $df_verbose "Login item already removed: $name"
         return 0
     fi
-    osascript -e "tell application \"System Events\" to delete login item \"$1\"" >/dev/null 2>&1
+    $df_run osascript -e "tell application \"System Events\" to delete login item \"$1\"" >/dev/null 2>&1
 )
 
 df_macos_ensure_login_item() (
@@ -482,8 +482,16 @@ df_macos_ensure_login_item() (
     name="$(basename "$path" .app)"
     if ! df_macos_login_items | grep "$name" >/dev/null 2>&1; then
         df_macos_add_login_item "$path"
-        open --background "$path"
+        $df_run open --background "$path"
     fi
+)
+
+df_macos_set_default() (
+    domain="$1"
+    key="$2"
+    type="$3"
+    value="$4"
+    $df_run defaults write "$domain" "$key" "$type" "$value"
 )
 
 df_on_macos() {
