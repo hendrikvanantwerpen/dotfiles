@@ -42,7 +42,6 @@ while [ $# -gt 0 ]; do
             ;;
     esac
 done
-echo "$mods"
 
 if [ -n "$mods" ]; then
     echo "$mods"
