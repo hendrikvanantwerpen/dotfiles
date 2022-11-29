@@ -19,7 +19,7 @@ fi
 . "$DF_DIR/script/lib"
 
 
-df_log "intern ($df_rev)"
+df_log "intern ($df_rev in $DF_DIR)"
 
 guard=
 while [ $# -gt 0 ]; do

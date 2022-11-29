@@ -18,6 +18,8 @@ fi
 
 . "$DF_DIR/script/lib"
 
+df_log "status ($df_rev in $DF_DIR)"
+
 mods=
 while [ $# -gt 0 ]; do
     arg="$1"

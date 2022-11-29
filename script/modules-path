@@ -16,4 +16,4 @@ else
     fi
 fi
 
-printf "%s\n" "%DF_DIR/modules"
+printf "%s\n" "$DF_DIR/modules"

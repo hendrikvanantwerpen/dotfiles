@@ -18,6 +18,8 @@ fi
 
 . "$DF_DIR/script/lib"
 
+df_log "services ($df_rev in $DF_DIR)"
+
 if [ "$df_os" != macos ]; then
     df_panic "Only supported on macOS"
 fi
