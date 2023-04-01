@@ -21,36 +21,65 @@ fi
 
 df_log "intern ($df_rev in $DF_DIR)"
 
-guard=
+mod=
+host_guard=
+os_guard=
+arch_guard=
 while [ $# -gt 0 ]; do
     case "$1" in
+        -m|--module)
+            shift 1
+            if [ $# -lt 1 ]; then
+                df_panic "Missing module name after $arg"
+            fi
+            mod="$1"
+            shift 1
+            if ! df_is_dir "$DF_DIR/modules/$mod"; then
+                df_panic "Module $mod does not exist"
+            fi
+            ;;
         -N|--dry-run)
+            shift 1
             df_set_dry_run
             ;;
         --host)
-            if [ -n "$guard" ]; then
-                df_panic "Multiple guards specified."
+            shift 1
+            if [ -n "$os_guard" ]; then
+                df_panic "Cannot be combined with --os"
             fi
-            guard="host=$df_hostname"
+            host_guard="host=$df_hostname"
             ;;
         --os)
-            if [ -n "$guard" ]; then
-                df_panic "Multiple guards specified."
+            shift 1
+            if [ -n "$host_guard" ]; then
+                df_panic "Cannot be combined with --host"
             fi
-            guard="os=$df_os"
+            os_guard="os=$df_os"
+            ;;
+        --arch)
+            shift 1
+            if [ -z "$os_guard" ]; then
+                df_panic "Must come after --os"
+            fi
+            arch_guard=",arch=$df_arch"
             ;;
         -v|--verbose)
+            shift 1
             df_set_verbose
             ;;
         *)
             break
             ;;
     esac
-    shift 1
 done
+guard="$host_guard$os_guard$arch_guard"
+
+if [ -z "$mod" ]; then
+    df_panic "Missing required argument --module/-m"
+fi
 
 if [ $# -lt 1 ]; then
-    df_panic "No files specified to intern."
+    df_panic "No files specified to intern"
 fi
 
 for tgt in "$@"; do
@@ -58,11 +87,11 @@ for tgt in "$@"; do
     case "$tgt" in
         "$HOME"/*)
             file="${tgt#"$HOME"/}"
-            df_symlink_intern "$DF_DIR/home" "$HOME" "$file" "$guard"
+            df_symlink_intern "$DF_DIR/modules/$mod/home" "$HOME" "$file" "$guard"
             ;;
         /usr/local/*)
             file="${tgt#$/usr/local/}"
-            df_symlink_intern "$DF_DIR/local" /usr/local "$file" "$guard"
+            df_symlink_intern "$DF_DIR/modules/$mod/local" /usr/local "$file" "$guard"
             ;;
         *)
             df_error "$(df_homify "$tgt"): not contained in \$HOME or /usr/local"

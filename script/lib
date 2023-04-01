@@ -300,12 +300,12 @@ df_symlink_uninstall() (
 )
 
 df_symlink_intern() (
+    ext=.symlink
     if [ -n "$4" ]; then
         ext="$ext\[$4\]"
     fi
-    src="$1/$3.$ext"
+    src="$1/$3$ext"
     tgt="$2/$3"
-    ext=.symlink
     if ! df_exists "$tgt"; then
         df_error "$(df_homify "$tgt"): does not exist"
         return
