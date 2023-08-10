@@ -39,6 +39,9 @@ while [ $# -gt 0 ]; do
         -N|--dry-run)
             df_set_dry_run
             ;;
+        -f|--force)
+            df_set_force
+            ;;
         -v|--verbose)
             df_set_verbose
             ;;
@@ -47,6 +50,11 @@ while [ $# -gt 0 ]; do
             ;;
     esac
 done
+
+## Always force install inside a Codespace, because it is unattended
+if [ "$df_host" = "codespace" ]; then
+    df_set_force
+fi
 
 case "$df_os" in
 "macos")

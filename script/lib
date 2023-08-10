@@ -74,6 +74,11 @@ df_panic() (
     exit 1
 )
 
+## Force
+
+df_set_force() {
+    df_force=true
+}
 
 ## Paths
 
@@ -268,8 +273,14 @@ df_symlink_install() (
             return
         fi
     elif df_exists "$tgt"; then
-        df_error "$(df_homify "$tgt"): conflict, not installed"
-        return
+        if $df_force; then
+            bak="$tgt.df~"
+            mv "$tgt" "$bak"
+            df_warning "$(df_homify "$tgt"): conflict, moved to $bak"
+        else
+            df_error "$(df_homify "$tgt"): conflict, not installed"
+            return
+        fi
     fi
     dir="$(dirname "$tgt")"
     if df_exists "$dir" && ! df_is_or_links_dir "$dir"; then
@@ -509,6 +520,9 @@ df_run=
 
 ## Used to control verbose output
 df_verbose=true
+
+## Used to control forced install
+df_force=false
 
 ## log file location
 df_log_file="$HOME/.dotfiles.log"
