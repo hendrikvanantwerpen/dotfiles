@@ -52,7 +52,7 @@ while [ $# -gt 0 ]; do
 done
 
 ## Always force install inside a Codespace, because it is unattended
-if [ "$df_host" = "codespace" ]; then
+if [ "$df_hostname" = "codespace" ]; then
     df_set_force
 fi
 
