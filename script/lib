@@ -357,6 +357,13 @@ df_macos_brew_bundle() (
     $df_run "$df_macos_brew" bundle --file="$brewfile" --no-upgrade --no-lock
 )
 
+## APT
+
+df_apt_install() (
+    aptfile="$1"
+    $df_run sudo apt update
+    $df_run grep -vE '^#' "$aptfile" | xargs sudo apt install --yes
+)
 
 ## Services
 
@@ -494,10 +501,6 @@ df_macos_set_default() (
     $df_run defaults write "$domain" "$key" "$type" "$value"
 )
 
-df_on_macos() {
-    [ "$df_os" = "macos" ]
-}
-
 ## General variables
 ## Not meant to be overridden!
 
@@ -519,7 +522,7 @@ df_rev="$(git -C "$DF_DIR" rev-parse HEAD)"
 df_hostname="$(hostname -s)"
 ## Pretend all codespaces are one host, which is not quite right, since
 ## codespaces are not necessarily all running the same os or arch.
-if [ "${CODESPACES+x}" == "x" ]; then
+if [ "${CODESPACES+x}" = "x" ]; then
     df_hostname=codespace
 fi
 

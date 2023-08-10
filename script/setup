@@ -48,7 +48,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if df_on_macos; then
+case "$df_os" in
+"macos")
     if ! pkgutil --pkg-info=com.apple.pkg.CLTools_Executables >/dev/null 2>&1 || ! df_exists "$(xcode-select --print-path)/usr/bin/make"; then
         df_warning "XCode Command Line Tools not installed. Running installer..."
         $df_run xcode-select --install
@@ -64,7 +65,8 @@ if df_on_macos; then
         fi
         /bin/bash -c "$(/usr/bin/curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
-fi
+    ;;
+esac
 
 df_symlink_install "$DF_DIR/bin/dotfiles.symlink" "$HOME/bin/dotfiles"
 
@@ -85,7 +87,18 @@ fi | while IFS= read -r mod; do
 
     df_source_if_exists "$DF_MOD_DIR/pre-setup"
 
-    if df_on_macos; then
+    case "$df_os" in
+    "linux")
+        if df_is_file "$DF_MOD_DIR/linux/packages.list"; then
+            if ! df_macos_brew_bundle "$DF_MOD_DIR/linux/packages.list"; then
+                df_warning "APT install failed."
+                if ! df_confirm "Continue setup?"; then
+                    exit 1
+                fi
+            fi
+        fi
+        ;;
+    "macos")
         if df_is_file "$DF_MOD_DIR/macos/Brewfile"; then
             if ! df_macos_brew_bundle "$DF_MOD_DIR/macos/Brewfile"; then
                 df_warning "Bundle install failed."
@@ -94,14 +107,17 @@ fi | while IFS= read -r mod; do
                 fi
             fi
         fi
-    fi
+        ;;
+    esac
 
     df_forall_symlinks "$DF_MOD_DIR/home" "$HOME" df_symlink_install
     df_forall_symlinks "$DF_MOD_DIR/local" /usr/local df_symlink_install
 
-    if df_on_macos; then
+    case "$df_os" in
+    "macos")
         df_source_if_exists "$DF_MOD_DIR/macos/defaults"
-    fi
+        ;;
+    esac
 
     df_source_if_exists "$DF_MOD_DIR/post-setup"
 done
