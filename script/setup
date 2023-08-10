@@ -98,7 +98,7 @@ fi | while IFS= read -r mod; do
     case "$df_os" in
     "linux")
         if df_is_file "$DF_MOD_DIR/linux/packages.list"; then
-            if ! df_macos_brew_bundle "$DF_MOD_DIR/linux/packages.list"; then
+            if ! df_apt_install "$DF_MOD_DIR/linux/packages.list"; then
                 df_warning "APT install failed."
                 if ! df_confirm "Continue setup?"; then
                     exit 1
