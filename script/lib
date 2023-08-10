@@ -517,6 +517,11 @@ df_rev="$(git -C "$DF_DIR" rev-parse HEAD)"
 ## current hostname
 # shellcheck disable=SC2034
 df_hostname="$(hostname -s)"
+## Pretend all codespaces are one host, which is not quite right, since
+## codespaces are not necessarily all running the same os or arch.
+if [ "${CODESPACES+x}" == "x" ]; then
+    df_hostname=codespace
+fi
 
 ## current os
 # shellcheck disable=SC2034
