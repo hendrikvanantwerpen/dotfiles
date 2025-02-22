@@ -333,6 +333,7 @@ df_symlink_intern() (
         df_error "$(df_homify "$tgt"): conflict, cannot intern"
         return
     else
+        $df_run mkdir -p "$(dirname "$src")" 2>/dev/null
         if ! $df_run mv "$tgt" "$src" 2>/dev/null; then
             df_error "$(df_homify "$tgt"): moving file failed, not interned"
             return
@@ -392,7 +393,7 @@ df_macos_service_is_homebrew() (
 
 df_macos_plist_label() (
     plist="$1"
-    /usr/libexec/PlistBuddy -c 'print Label' "$plist"
+    /usr/libexec/PlistBuddy -c 'print Label' "$plist" 2>/dev/null || true
 )
 
 df_macos_service_target() (
