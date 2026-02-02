@@ -25,6 +25,10 @@ df_print_run() (
     printf '\n'
 )
 
+df_set_no_system() {
+    df_system=false
+}
+
 df_shellescape() (
     printf '%s\n' "$@" | sed -e 's/[^a-zA-Z0-9,._+@%/-]/\\&/g'
 )
@@ -524,6 +528,9 @@ df_verbose=true
 
 ## Used to control forced install
 df_force=false
+
+## Used to control system (non-user) installs
+df_system=true
 
 ## log file location
 df_log_file="$HOME/.dotfiles.log"
