@@ -16,7 +16,7 @@ else
     fi
 fi
 
-. "$DF_DIR/script/lib"
+. "$DF_DIR/scripts/lib"
 
 df_log "teardown ($df_rev in $DF_DIR)"
 

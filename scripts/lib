@@ -370,7 +370,7 @@ df_try_unlink() (
 
 df_macos_brew_bundle() (
     brewfile="$1"
-    $df_run "$df_macos_brew" bundle --file="$brewfile" --no-upgrade --no-lock
+    $df_run "$df_macos_brew" bundle --file="$brewfile" --no-upgrade
 )
 
 ## APT

@@ -16,7 +16,7 @@ else
     fi
 fi
 
-. "$DF_DIR/script/lib"
+. "$DF_DIR/scripts/lib"
 
 df_require_commands shellcheck
 
