@@ -18,9 +18,9 @@ if [ $# -lt 1 ]; then
     echo ""
     echo "Commands:"
     echo ""
-    (cd "$DF_DIR/script/" || return; find . -name .git -prune -o -type f -perm /111 -print) | while IFS= read -r cmd; do
+    (cd "$DF_DIR/scripts/" || return; find . -name .git -prune -o -type f -perm /111 -print) | while IFS= read -r cmd; do
         printf "    %-26s" "${cmd#./}"
-        sed -n "2{s/^#\+//;p;q}" "$DF_DIR/script/$cmd"
+        sed -n "2{s/^#\+//;p;q}" "$DF_DIR/scripts/$cmd"
     done
     echo ""
     exit 0
@@ -28,7 +28,7 @@ fi
 
 cmd=$1
 shift 1
-script="$DF_DIR/script/$cmd"
+script="$DF_DIR/scripts/$cmd"
 if [ ! -x "$script" ]; then
     echo "Command $cmd not found. Missing $script" 2>&1
     exit 1
