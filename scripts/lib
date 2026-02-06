@@ -365,6 +365,15 @@ df_try_unlink() (
     fi
 )
 
+df_cleanup_broken_links() (
+    target_dir="$1"
+    if ! df_is_or_links_dir "$target_dir"; then
+        return
+    fi
+    find "$target_dir" -type l -lname "$DF_DIR/**" -xtype l 2>/dev/null | while IFS= read -r link; do
+        $df_try_unlink "$link"
+    done
+)
 
 ## Homebrew
 

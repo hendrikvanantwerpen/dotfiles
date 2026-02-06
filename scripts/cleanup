@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+## Cleanup broken dotfiles symlinks
+
+set -eu
+
+if [ -n "${DF_DIR+set}" ]; then
+    if [ ! -f "$DF_DIR/.dotfiles" ]; then
+        echo "Provided \$DF_DIR $DF_DIR not a dotfiles directory: missing .dotfiles" 1>&2
+        exit 1
+    fi
+else
+    DF_DIR=$(cd -P "$(dirname "$0")/.." >/dev/null 2>&1 && pwd)
+    if [ ! -f "$DF_DIR/.dotfiles" ]; then
+        echo "Script $0 not located in the script directory of a dotfiles directory: missing .dotfiles" 1>&2
+        exit 1
+    fi
+fi
+
+. "$DF_DIR/scripts/lib"
+
+df_log "cleanup ($df_rev in $DF_DIR)"
+
+mods=
+while [ $# -gt 0 ]; do
+    arg="$1"
+    shift 1
+    case "$arg" in
+        -N|--dry-run)
+            df_set_dry_run
+            ;;
+        --no-system)
+            df_set_no_system
+            ;;
+        -v|--verbose)
+            df_set_verbose
+            ;;
+        *)
+            df_panic "Unexpected argument: $arg"
+            ;;
+    esac
+done
+
+$df_verbose "Cleanup up home directory"
+df_cleanup_broken_links "$HOME"
+
+if $df_system; then
+    $df_verbose "Cleanup up system directory"
+    df_cleanup_broken_links /usr/local
+fi
